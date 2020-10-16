@@ -1,4 +1,4 @@
-package at.fhhagenberg.sqe;
+package at.fhhgb.team.a.elevators;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

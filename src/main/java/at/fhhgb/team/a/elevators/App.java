@@ -1,4 +1,4 @@
-package at.fhhagenberg.sqe;
+package at.fhhgb.team.a.elevators;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -14,10 +14,8 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
-        var javaVersion = SystemInfo.javaVersion();
-        var javafxVersion = SystemInfo.javafxVersion();
 
-        var label = new Label("Hello, JavaFX " + javafxVersion + ", running on Java " + javaVersion + ".");
+        var label = new Label("Hello, JavaFX");
         var layout = new BorderPane(label);
         var button = new Button("Click me!");
         button.setOnAction(evt -> button.setText("Clicked!"));
