@@ -33,16 +33,4 @@ public class AppTest {
     public void testButtonWithText(FxRobot robot) {
         FxAssert.verifyThat(".button", LabeledMatchers.hasText("Click me!"));
     }
-
-    /**
-     * @param robot - Will be injected by the test runner.
-     */
-    @Test
-    public void testButtonClick(FxRobot robot) {
-        // when:
-        robot.clickOn(".button");
-
-        // or (lookup by css class):
-        FxAssert.verifyThat(".button", LabeledMatchers.hasText("Clicked!"));
-    }
 }
