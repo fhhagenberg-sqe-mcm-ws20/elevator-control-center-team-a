@@ -11,4 +11,32 @@ public class Building {
     /** The elevators in the building.
      * Elevator numbering starts at zero for elevator 1. */
     private ArrayList<Elevator> elevators = new ArrayList<>();
+
+    public Building() {
+
+    }
+
+    /**
+     * Retrieves the floors in the building.
+     * @return the floors
+     */
+    public ArrayList<Floor> getFloors() {
+        return floors;
+    }
+
+    public void setFloors(ArrayList<Floor> floors) {
+        this.floors = floors;
+    }
+
+    /**
+     * Retrieves the elevators in the building.
+     * @return the elevators
+     */
+    public ArrayList<Elevator> getElevators() {
+        return elevators;
+    }
+
+    public void setElevators(ArrayList<Elevator> elevators) {
+        this.elevators = elevators;
+    }
 }
