@@ -1,6 +1,8 @@
 package at.fhhgb.team.a.elevators.model;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Represents an elevator used in the system
@@ -44,7 +46,7 @@ public class Elevator {
      * When elevators are allowed to only service certain floors,
      * this can help to achieve greater passenger service.
      * Every elevator must service the ground floor. */
-    private ArrayList<Floor> floorService = new ArrayList<>();
+    private Set<Floor> servicedFloors = new HashSet<>();
 
     /** This provides the current weight of the elevator less the weight of the empty elevator –
      * hence the weight of the passengers on board.
@@ -123,8 +125,8 @@ public class Elevator {
      * Retrieves which floors are serviced by the elevator.
      * @return a list containing all floors which are serviced
      */
-    public ArrayList<Floor> getFloorService() {
-        return floorService;
+    public Set<Floor> getServicedFloors() {
+        return servicedFloors;
     }
 
     /**
@@ -133,6 +135,33 @@ public class Elevator {
      */
     public float getWeight() {
         return weight;
+    }
+
+    /**
+     * Provides the status of a floor request button on the elevator (on/off).
+     * @param floorNumber - floor number button being checked on the elevator
+     * @return returns boolean to indicate if floor button on the elevator is active (true) or not (false)
+     */
+    public boolean getElevatorButton(int floorNumber) {
+        Floor floor = servicedFloors.stream()
+                .filter(f -> f.getNumber() == floorNumber)
+                .findFirst()
+                .orElse(new Floor());
+
+        return floor.getDownButton().isOn() || floor.getUpButton().isOn();
+    }
+
+    /**
+     * Retrieves whether or not the elevator will service the specified floor (yes/no).
+     * @param floorNumber floor whose service status by the elevator is being retrieved
+     * @return service status whether the floor is serviced by the elevator (yes=true,no=false)
+     */
+    public boolean servicesFloor(int floorNumber) {
+        Optional<Floor> floor = servicedFloors.stream()
+                .filter(f -> f.getNumber() == floorNumber)
+                .findFirst();
+
+        return floor.isPresent();
     }
 
     /**
@@ -152,10 +181,10 @@ public class Elevator {
     }
 
     /**
-     * Sets which particular floors the elevator services.
-     * @param floorService the list of floors which should be serviced from the elevator
+     * Adds a particular floor to be serviced by the elevator.
+     * @param floor the flor which should be serviced from the elevator
      */
-    public void setFloorService(ArrayList<Floor> floorService) {
-        this.floorService = floorService;
+    public void addFloorService(Floor floor) {
+        servicedFloors.add(floor);
     }
 }

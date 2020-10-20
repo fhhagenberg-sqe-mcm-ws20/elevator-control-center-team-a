@@ -11,4 +11,18 @@ public enum DoorStatus {
     DoorStatus(int number) {
         this.number = number;
     }
+
+    public static DoorStatus fromNumber(int number) {
+        switch (number) {
+            case 1:
+                return open;
+            case 2:
+                return closed;
+            case 3:
+                return opening;
+            case 4:
+                return closing;
+        }
+        return null;
+    }
 }

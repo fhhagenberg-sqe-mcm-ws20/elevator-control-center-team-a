@@ -65,7 +65,7 @@
                 <version>0.0.3</version>
                 <configuration>
                     <launcher>launcher</launcher>
-                    <mainClass>at.fhhgb.team.a.elevators.App</mainClass>
+                    <mainClass>at.fhhgb.team.a.elevators.app.App</mainClass>
                 </configuration>
             </plugin>
             <plugin>

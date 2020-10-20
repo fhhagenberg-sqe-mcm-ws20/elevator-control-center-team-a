@@ -16,6 +16,12 @@ public class Building {
 
     }
 
+    public Building(ArrayList<Floor> floors,
+                    ArrayList<Elevator> elevators) {
+        this.floors = floors;
+        this.elevators = elevators;
+    }
+
     /**
      * Retrieves the floors in the building.
      * @return the floors
@@ -30,6 +36,32 @@ public class Building {
      */
     public ArrayList<Elevator> getElevators() {
         return elevators;
+    }
+
+    /**
+     * Retrieves the elevator with the specific number.
+     * @param elevatorNumber the number of the elevator which is searched
+     * @return the elevator with the specified number
+     */
+    public Elevator getElevator(int elevatorNumber) {
+        return elevators
+                .stream()
+                .filter(e -> e.getNumber() == elevatorNumber)
+                .findFirst()
+                .orElse(new Elevator());
+    }
+
+    /**
+     * Retrieves the floor with the specific number.
+     * @param floorNumber the number of the floor which is searched
+     * @return the floor with the specified number
+     */
+    public Floor getFloor(int floorNumber) {
+        return floors
+                .stream()
+                .filter(f -> f.getNumber() == floorNumber)
+                .findFirst()
+                .orElse(new Floor());
     }
 
     public void setFloors(ArrayList<Floor> floors) {
