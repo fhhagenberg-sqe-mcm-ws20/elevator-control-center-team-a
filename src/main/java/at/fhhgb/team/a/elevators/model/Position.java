@@ -7,7 +7,7 @@ public class Position {
     private float positionFeet = 0.0f;
 
     /** The current position of the elevator to the closest floor. */
-    private Floor closestFloor = new Floor();
+    private Floor closestFloor = Building.GROUND_FLOOR;
 
     public Position() {
 

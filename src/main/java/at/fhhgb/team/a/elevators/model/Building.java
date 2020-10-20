@@ -1,41 +1,47 @@
 package at.fhhgb.team.a.elevators.model;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Building {
 
+    /** The height of all floors. */
+    public static float FLOOR_HEIGHT = 500;
+
+    /** The ground floor of the building. */
+    public final static Floor GROUND_FLOOR = new Floor(0);
+
     /** The floors in the building, including the ground floor.
      * It is assumed there are no floors below ground level. */
-    private ArrayList<Floor> floors = new ArrayList<>();
+    private Set<Floor> floors = new HashSet<>();
 
     /** The elevators in the building.
      * Elevator numbering starts at zero for elevator 1. */
-    private ArrayList<Elevator> elevators = new ArrayList<>();
+    private Set<Elevator> elevators = new HashSet<>();
 
-    public Building() {
+    public Building(float floorHeight,
+                    Set<Floor> floors,
+                    Set<Elevator> elevators) {
+        FLOOR_HEIGHT = floorHeight;
 
-    }
-
-    public Building(ArrayList<Floor> floors,
-                    ArrayList<Elevator> elevators) {
         this.floors = floors;
         this.elevators = elevators;
     }
 
     /**
-     * Retrieves the floors in the building.
-     * @return the floors
+     * Retrieves the number of floors in the building.
+     * @return total number of floors
      */
-    public ArrayList<Floor> getFloors() {
-        return floors;
+    public int getFloorNum() {
+        return floors.size();
     }
 
     /**
-     * Retrieves the elevators in the building.
-     * @return the elevators
+     * Retrieves the number of elevators in the building.
+     * @return total number of elevators
      */
-    public ArrayList<Elevator> getElevators() {
-        return elevators;
+    public int getElevatorNum() {
+        return elevators.size();
     }
 
     /**
@@ -48,7 +54,7 @@ public class Building {
                 .stream()
                 .filter(e -> e.getNumber() == elevatorNumber)
                 .findFirst()
-                .orElse(new Elevator());
+                .orElse(null);
     }
 
     /**
@@ -61,14 +67,6 @@ public class Building {
                 .stream()
                 .filter(f -> f.getNumber() == floorNumber)
                 .findFirst()
-                .orElse(new Floor());
-    }
-
-    public void setFloors(ArrayList<Floor> floors) {
-        this.floors = floors;
-    }
-
-    public void setElevators(ArrayList<Elevator> elevators) {
-        this.elevators = elevators;
+                .orElse(null);
     }
 }

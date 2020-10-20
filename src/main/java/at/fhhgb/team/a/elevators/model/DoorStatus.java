@@ -12,6 +12,11 @@ public enum DoorStatus {
         this.number = number;
     }
 
+    /**
+     * Provides the current status of the doors of an elevator (open/closed).
+     * @param number the flag number of the door status
+     * @return the corresponding door status
+     */
     public static DoorStatus fromNumber(int number) {
         switch (number) {
             case 1:

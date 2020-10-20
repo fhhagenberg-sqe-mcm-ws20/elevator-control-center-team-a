@@ -15,16 +15,12 @@ public class ElevatorControlCenter implements IElevator {
      * The building used in the elevator control center.
      * The building itself has floors and elevators.
      */
-    private Building building = new Building();
+    private Building building;
 
     /**
      * The clock of the elevator control center.
      */
     private Clock clock = Clock.systemUTC();
-
-    public ElevatorControlCenter() {
-
-    }
 
     public ElevatorControlCenter(Building building) {
         this.building = building;
@@ -66,7 +62,7 @@ public class ElevatorControlCenter implements IElevator {
 
     @Override
     public int getElevatorNum() throws RemoteException {
-        return building.getElevators().size();
+        return building.getElevatorNum();
     }
 
     @Override
@@ -97,15 +93,13 @@ public class ElevatorControlCenter implements IElevator {
     @Override
     public boolean getFloorButtonDown(int floorNumber) throws RemoteException {
         Floor floor = building.getFloor(floorNumber);
-        return floor.getDownButton()
-                .isOn();
+        return floor.isDownButtonOn();
     }
 
     @Override
     public boolean getFloorButtonUp(int floorNumber) throws RemoteException {
         Floor floor = building.getFloor(floorNumber);
-        return floor.getUpButton()
-                .isOn();
+        return floor.isUpButtonOn();
     }
 
     @Override
@@ -116,7 +110,7 @@ public class ElevatorControlCenter implements IElevator {
 
     @Override
     public int getFloorNum() throws RemoteException {
-        return building.getFloors().size();
+        return building.getFloorNum();
     }
 
     @Override

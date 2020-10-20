@@ -33,7 +33,7 @@ public class Elevator {
 
     /** The current floor target of the elevator as set by the controller.
      * The elevator will travel to that target and stop until directed to the next target. */
-    private Floor target = new Floor();
+    private Floor target = Building.GROUND_FLOOR;
 
     /** The current committed direction of the elevator.
      * Elevators responding to a passenger floor button must have a committed direction, up or down.
@@ -53,8 +53,12 @@ public class Elevator {
      * This can be useful for detecting when the elevator is getting full. */
     private float weight = 0.0f;
 
-    public Elevator() {
-
+    public Elevator(int number,
+                    int capacity,
+                    float weight) {
+        this.number = number;
+        this.capacity = capacity;
+        this.weight = weight;
     }
 
     /**
@@ -122,14 +126,6 @@ public class Elevator {
     }
 
     /**
-     * Retrieves which floors are serviced by the elevator.
-     * @return a list containing all floors which are serviced
-     */
-    public Set<Floor> getServicedFloors() {
-        return servicedFloors;
-    }
-
-    /**
      * Retrieves the weight of passengers on the elevator.
      * @return total weight of all passengers in lbs
      */
@@ -146,9 +142,9 @@ public class Elevator {
         Floor floor = servicedFloors.stream()
                 .filter(f -> f.getNumber() == floorNumber)
                 .findFirst()
-                .orElse(new Floor());
+                .orElse(Building.GROUND_FLOOR);
 
-        return floor.getDownButton().isOn() || floor.getUpButton().isOn();
+        return floor.isDownButtonOn() || floor.isUpButtonOn();
     }
 
     /**
