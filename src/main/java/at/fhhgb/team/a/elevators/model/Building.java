@@ -17,14 +17,21 @@ public class Building {
 
     /** The elevators in the building.
      * Elevator numbering starts at zero for elevator 1. */
-    private Set<Elevator> elevators = new HashSet<>();
+    private Set<Elevator> elevators;
 
     public Building(float floorHeight,
-                    Set<Floor> floors,
+                    int floorNum,
                     Set<Elevator> elevators) {
         FLOOR_HEIGHT = floorHeight;
 
-        this.floors = floors;
+        // Add floors to the building.
+        floors.add(GROUND_FLOOR);
+        for (int i = 1; i <= floorNum; i++) {
+            Floor floor = new Floor(i);
+            floors.add(floor);
+        }
+
+        // Add elevators to the building.
         this.elevators = elevators;
     }
 
