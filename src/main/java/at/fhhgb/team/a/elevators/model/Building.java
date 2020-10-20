@@ -8,31 +8,21 @@ public class Building {
     /** The height of all floors. */
     public static float FLOOR_HEIGHT = 500;
 
-    /** The ground floor of the building. */
-    public final static Floor GROUND_FLOOR = new Floor(0);
-
     /** The floors in the building, including the ground floor.
      * It is assumed there are no floors below ground level. */
-    private Set<Floor> floors = new HashSet<>();
+    private Set<Floor> floors;
 
     /** The elevators in the building.
      * Elevator numbering starts at zero for elevator 1. */
     private Set<Elevator> elevators;
 
     public Building(float floorHeight,
-                    int floorNum,
-                    Set<Elevator> elevators) {
+                    Set<Elevator> elevators,
+                    Set<Floor> floors) {
         FLOOR_HEIGHT = floorHeight;
 
-        // Add floors to the building.
-        floors.add(GROUND_FLOOR);
-        for (int i = 1; i <= floorNum; i++) {
-            Floor floor = new Floor(i);
-            floors.add(floor);
-        }
-
-        // Add elevators to the building.
         this.elevators = elevators;
+        this.floors = floors;
     }
 
     /**

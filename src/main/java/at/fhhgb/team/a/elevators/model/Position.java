@@ -4,13 +4,14 @@ public class Position {
 
     /** The current position of the elevator in feet.
      * Position is measured in feet above ground floor with zero being the bottom.. */
-    private float positionFeet = 0.0f;
+    private float positionFeet;
 
     /** The current position of the elevator to the closest floor. */
-    private Floor closestFloor = Building.GROUND_FLOOR;
+    private Floor closestFloor;
 
-    public Position() {
-
+    public Position(int feetFromGround, Floor closestFloor) {
+        this.closestFloor = closestFloor;
+        this.positionFeet = feetFromGround;
     }
 
     /**

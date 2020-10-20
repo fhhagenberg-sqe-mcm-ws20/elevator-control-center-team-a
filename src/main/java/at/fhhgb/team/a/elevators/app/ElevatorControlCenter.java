@@ -1,159 +1,131 @@
 package at.fhhgb.team.a.elevators.app;
 
 import at.fhhgb.team.a.elevators.api.IElevator;
-import at.fhhgb.team.a.elevators.model.Building;
-import at.fhhgb.team.a.elevators.model.Direction;
-import at.fhhgb.team.a.elevators.model.Elevator;
-import at.fhhgb.team.a.elevators.model.Floor;
+import at.fhhgb.team.a.elevators.model.*;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.time.Clock;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
-public class ElevatorControlCenter implements IElevator {
+public class ElevatorControlCenter {
+
+    /**
+     * Elevator that is controlled by this center
+     */
+    private IElevator elevatorApi;
 
     /**
      * The building used in the elevator control center.
-     * The building itself has floors and elevators.
      */
     private Building building;
 
     /**
-     * The clock of the elevator control center.
+     * The clock tick of the elevator control center.
      */
-    private Clock clock = Clock.systemUTC();
+    private long clockTick;
 
-    public ElevatorControlCenter(Building building) {
+    public ElevatorControlCenter(IElevator elevatorApi) {
+        this.elevatorApi = elevatorApi;
+    }
+
+    public void pollElevatorApi() throws RemoteException {
+        this.clockTick = elevatorApi.getClockTick();
+        updateBuilding();
+    }
+
+    public Building getBuilding() {
+        return this.building;
+    }
+
+    private void updateBuilding() throws RemoteException {
+        int floorHeight = elevatorApi.getFloorHeight();
+        Set<Floor> floors = createFloors();
+        Set<Elevator> elevators = createElevators(floors);
+        addFloorServiceAssignments(elevators, floors);
+        Building building = new Building(floorHeight, elevators, floors);
         this.building = building;
     }
 
-    @Override
-    public int getCommittedDirection(int elevatorNumber) throws RemoteException {
-        Elevator elevator = building.getElevator(elevatorNumber);
-        return elevator.getCommittedDirection()
-                .number;
-    }
+    private Set<Elevator> createElevators(Set<Floor> floors) throws RemoteException {
+        Set<Elevator> elevators = new HashSet<>();
+        int elevatorNum = elevatorApi.getElevatorNum();
 
-    @Override
-    public int getElevatorAccel(int elevatorNumber) throws RemoteException {
-        Elevator elevator = building.getElevator(elevatorNumber);
-        return (int) elevator.getAcceleration();
-    }
+        for(int i = 0; i < elevatorNum; i ++) {
+            Elevator elevator = createElevator(floors, i);
+            if (elevator == null) continue;
 
-    @Override
-    public boolean getElevatorButton(int elevatorNumber, int floorNumber) throws RemoteException {
-        Elevator elevator = building.getElevator(elevatorNumber);
-        return elevator.getElevatorButton(floorNumber);
-    }
-
-    @Override
-    public int getElevatorDoorStatus(int elevatorNumber) throws RemoteException {
-        Elevator elevator = building.getElevator(elevatorNumber);
-        return elevator.getDoorStatus()
-                .number;
-    }
-
-    @Override
-    public int getElevatorFloor(int elevatorNumber) throws RemoteException {
-        Elevator elevator = building.getElevator(elevatorNumber);
-        return elevator.getCurrentPosition()
-                .getClosestFloor()
-                .getNumber();
-    }
-
-    @Override
-    public int getElevatorNum() throws RemoteException {
-        return building.getElevatorNum();
-    }
-
-    @Override
-    public int getElevatorPosition(int elevatorNumber) throws RemoteException {
-        Elevator elevator = building.getElevator(elevatorNumber);
-        return (int) elevator.getCurrentPosition()
-                .getPositionFeet();
-    }
-
-    @Override
-    public int getElevatorSpeed(int elevatorNumber) throws RemoteException {
-        Elevator elevator = building.getElevator(elevatorNumber);
-        return (int) elevator.getSpeed();
-    }
-
-    @Override
-    public int getElevatorWeight(int elevatorNumber) throws RemoteException {
-        Elevator elevator = building.getElevator(elevatorNumber);
-        return (int) elevator.getWeight();
-    }
-
-    @Override
-    public int getElevatorCapacity(int elevatorNumber) throws RemoteException {
-        Elevator elevator = building.getElevator(elevatorNumber);
-        return elevator.getCapacity();
-    }
-
-    @Override
-    public boolean getFloorButtonDown(int floorNumber) throws RemoteException {
-        Floor floor = building.getFloor(floorNumber);
-        return floor.isDownButtonOn();
-    }
-
-    @Override
-    public boolean getFloorButtonUp(int floorNumber) throws RemoteException {
-        Floor floor = building.getFloor(floorNumber);
-        return floor.isUpButtonOn();
-    }
-
-    @Override
-    public int getFloorHeight() throws RemoteException {
-        Floor firstFloor = building.getFloor(0);
-        return (int) firstFloor.getHeight();
-    }
-
-    @Override
-    public int getFloorNum() throws RemoteException {
-        return building.getFloorNum();
-    }
-
-    @Override
-    public boolean getServicesFloors(int elevatorNumber, int floorNumber) throws RemoteException {
-        Elevator elevator = building.getElevator(elevatorNumber);
-        return elevator.servicesFloor(floorNumber);
-    }
-
-    @Override
-    public int getTarget(int elevatorNumber) throws RemoteException {
-        Elevator elevator = building.getElevator(elevatorNumber);
-        return elevator.getTarget()
-                .getNumber();
-    }
-
-    @Override
-    public void setCommittedDirection(int elevatorNumber, int direction) throws RemoteException {
-        Elevator elevator = building.getElevator(elevatorNumber);
-
-        Direction dir = Direction.fromNumber(direction);
-        elevator.setCommittedDirection(dir);
-    }
-
-    @Override
-    public void setServicesFloors(int elevatorNumber, int floorNumber, boolean service) throws RemoteException {
-        Elevator elevator = building.getElevator(elevatorNumber);
-
-        if (service) {
-            Floor floor = building.getFloor(floorNumber);
-            elevator.addFloorService(floor);
+            elevators.add(elevator);
         }
+
+        return elevators;
     }
 
-    @Override
-    public void setTarget(int elevatorNumber, int target) throws RemoteException {
-        Elevator elevator = building.getElevator(elevatorNumber);
+    private Elevator createElevator(Set<Floor> floors, int elevatorNumber) throws RemoteException {
+        int target = elevatorApi.getTarget(elevatorNumber);
+        int elevatorFloor = elevatorApi.getElevatorFloor(elevatorNumber);
+        Optional<Floor> targetFloor = floors.stream().filter(f -> f.getNumber() == target).findFirst();
+        Optional<Floor> closestFloor = floors.stream().filter(f -> f.getNumber() == elevatorFloor).findFirst();
 
-        Floor floor = building.getFloor(target);
-        elevator.setTarget(floor);
+        if(!targetFloor.isPresent() || !closestFloor.isPresent()) {
+            // no floors found - skip this elevator
+            return null;
+        }
+
+        int committedDirection = elevatorApi.getCommittedDirection(elevatorNumber);
+        int elevatorAccel = elevatorApi.getElevatorAccel(elevatorNumber);
+        int elevatorCapacity = elevatorApi.getElevatorCapacity(elevatorNumber);
+        int elevatorDoorStatus = elevatorApi.getElevatorDoorStatus(elevatorNumber);
+        int elevatorPosition = elevatorApi.getElevatorPosition(elevatorNumber);
+        int elevatorSpeed = elevatorApi.getElevatorSpeed(elevatorNumber);
+        int elevatorWeight = elevatorApi.getElevatorWeight(elevatorNumber);
+        Position currentPosition = new Position(elevatorPosition, closestFloor.get());
+
+        Elevator elevator = new Elevator(elevatorNumber, elevatorCapacity, elevatorWeight, targetFloor.get(), currentPosition);
+        elevator.setCommittedDirection(Direction.fromNumber(committedDirection));
+        elevator.setSpeed(elevatorSpeed);
+        elevator.setAcceleration(elevatorAccel);
+        elevator.setDoorStatus(DoorStatus.fromNumber(elevatorDoorStatus));
+        return elevator;
     }
 
-    @Override
-    public long getClockTick() throws RemoteException {
-        return clock.millis();
+    private Set<Floor> createFloors() throws RemoteException {
+        Set<Floor> floors = new HashSet<>();
+        int floorNum = elevatorApi.getFloorNum();
+        for(int i = 0; i < floorNum; i ++) {
+            boolean buttonDown = elevatorApi.getFloorButtonDown(i);
+            boolean buttonUp = elevatorApi.getFloorButtonUp(i);
+
+            Floor floor = new Floor(i);
+
+            if(buttonDown) {
+                floor.pressDownButton();
+            }
+
+            if(buttonUp) {
+                floor.pressUpButton();
+            }
+
+            floors.add(floor);
+        }
+
+        return floors;
+    }
+
+    private void addFloorServiceAssignments(Set<Elevator> elevators, Set<Floor> floors){
+        floors.stream().forEach(f -> {
+            elevators.stream().forEach(e -> {
+                try {
+                    boolean serviced = elevatorApi.getServicesFloors(e.getNumber(), f.getNumber());
+                    if(serviced) {
+                        e.addFloorService(f);
+                    }
+                } catch (RemoteException ex) {
+                    ex.printStackTrace();
+                }
+            });
+        });
     }
 }
