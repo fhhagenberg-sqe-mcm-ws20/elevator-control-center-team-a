@@ -2,16 +2,12 @@ package at.fhhgb.team.a.elevators.model;
 
 public class Button {
 
-    /** The type of the button.
-     * Can be up or down */
-    private ButtonType type = ButtonType.up;
-
     /* The status of the button.
     * True means, the button is on. */
     private boolean isOn = false;
 
-    public Button(ButtonType type) {
-        this.type = type;
+    public Button() {
+
     }
 
     /**

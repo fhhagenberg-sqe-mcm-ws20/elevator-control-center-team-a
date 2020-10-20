@@ -8,4 +8,24 @@ public class Position {
 
     /** The current position of the elevator to the closest floor. */
     private Floor closestFloor = new Floor();
+
+    public Position() {
+
+    }
+
+    /**
+     * Retrieves the current position of the elevator in feet.
+     * @return current position in feet
+     */
+    public float getPositionFeet() {
+        return positionFeet;
+    }
+
+    /**
+     * Retrieves the current position of the elevator to the closest floor.
+     * @return current position to the closest floor
+     */
+    public Floor getClosestFloor() {
+        return closestFloor;
+    }
 }

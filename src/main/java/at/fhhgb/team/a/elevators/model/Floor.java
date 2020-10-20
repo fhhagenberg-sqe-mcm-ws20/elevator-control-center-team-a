@@ -12,14 +12,22 @@ public class Floor {
 
     /** The down button of the floor.
      * For the purposes of passengers calling the elevator. */
-    private Button downButton = new Button(ButtonType.down);
+    private Button downButton = new Button();
 
     /** The up button of the floor.
      * For the purposes of passengers calling the elevator. */
-    private Button upButton = new Button(ButtonType.up);
+    private Button upButton = new Button();
 
     public Floor() {
 
+    }
+
+    /**
+     * Retrieves the distinct number of the floor.
+     * @return distinct number of the floor
+     */
+    public int getNumber() {
+        return number;
     }
 
     /**

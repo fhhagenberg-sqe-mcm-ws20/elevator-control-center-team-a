@@ -56,6 +56,14 @@ public class Elevator {
     }
 
     /**
+     * Retrieves the distinct number of the elevator.
+     * @return distinct number of the elevator
+     */
+    public int getNumber() {
+        return number;
+    }
+
+    /**
      * Retrieves the maximum number of passengers that can fit on the elevator.
      * @return maximum number of passengers
      */

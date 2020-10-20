@@ -24,16 +24,16 @@ public class Building {
         return floors;
     }
 
-    public void setFloors(ArrayList<Floor> floors) {
-        this.floors = floors;
-    }
-
     /**
      * Retrieves the elevators in the building.
      * @return the elevators
      */
     public ArrayList<Elevator> getElevators() {
         return elevators;
+    }
+
+    public void setFloors(ArrayList<Floor> floors) {
+        this.floors = floors;
     }
 
     public void setElevators(ArrayList<Elevator> elevators) {
