@@ -39,7 +39,7 @@ public class Elevator {
      * When elevators are allowed to only service certain floors,
      * this can help to achieve greater passenger service.
      * Every elevator must service the ground floor. */
-    private Set<Floor> servicedFloors = new HashSet<>();
+    private final Set<Floor> servicedFloors = new HashSet<>();
 
     /** This provides the current weight of the elevator less the weight of the empty elevator –
      * hence the weight of the passengers on board.
