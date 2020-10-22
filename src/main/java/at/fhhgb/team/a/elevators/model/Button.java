@@ -6,9 +6,7 @@ public class Button {
     * True means, the button is on. */
     private boolean isOn = false;
 
-    public Button() {
-
-    }
+    public Button() {}
 
     /**
      * Provides the status of the button (on/off).
@@ -16,6 +14,13 @@ public class Button {
      */
     public boolean isOn() {
         return isOn;
+    }
+
+    /**
+     * Sets the status of the button to the opposite (on/off).
+     */
+    public void press() {
+        isOn = !isOn;
     }
 }
 

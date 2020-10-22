@@ -38,6 +38,23 @@
             <version>4.0.16-alpha</version>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.mockito/mockito-inline -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>3.5.15</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.assertj/assertj-core -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.17.2</version>
+            <scope>test</scope>
+        </dependency>
+
+
+
     </dependencies>
 
     <build>
@@ -65,7 +82,7 @@
                 <version>0.0.3</version>
                 <configuration>
                     <launcher>launcher</launcher>
-                    <mainClass>at.fhhgb.team.a.elevators.App</mainClass>
+                    <mainClass>at.fhhgb.team.a.elevators.app.App</mainClass>
                 </configuration>
             </plugin>
             <plugin>

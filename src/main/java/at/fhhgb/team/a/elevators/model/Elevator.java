@@ -1,6 +1,8 @@
 package at.fhhgb.team.a.elevators.model;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Represents an elevator used in the system
@@ -14,24 +16,17 @@ public class Elevator {
     /** The maximum number of passengers that can fit on an elevator. */
     private int capacity = 0;
 
-    /** The current speed of the elevator.
-     * Positive speed indicates an elevator heading up
-     * while negative indicates an elevator going down. */
     private float speed = 0.0f;
 
-    /** The current acceleration of the elevators. */
     private float acceleration = 0.0f;
 
-    /** The current position of the elevator, both in feet and to the closest floor. */
-    private Position currentPosition = new Position();
+    private Position currentPosition;
 
-    /** Whether the doors for an elevator are open or closed.
-     * The status may also indicate a transition between open or closed. */
     private DoorStatus doorStatus = DoorStatus.closed;
 
     /** The current floor target of the elevator as set by the controller.
      * The elevator will travel to that target and stop until directed to the next target. */
-    private Floor target = new Floor();
+    private Floor target;
 
     /** The current committed direction of the elevator.
      * Elevators responding to a passenger floor button must have a committed direction, up or down.
@@ -44,15 +39,23 @@ public class Elevator {
      * When elevators are allowed to only service certain floors,
      * this can help to achieve greater passenger service.
      * Every elevator must service the ground floor. */
-    private ArrayList<Floor> floorService = new ArrayList<>();
+    private final Set<Floor> servicedFloors = new HashSet<>();
 
     /** This provides the current weight of the elevator less the weight of the empty elevator –
      * hence the weight of the passengers on board.
      * This can be useful for detecting when the elevator is getting full. */
     private float weight = 0.0f;
 
-    public Elevator() {
-
+    public Elevator(int number,
+                    int capacity,
+                    float weight,
+                    Floor target,
+                    Position currentPosition) {
+        this.number = number;
+        this.capacity = capacity;
+        this.weight = weight;
+        this.target = target;
+        this.currentPosition = currentPosition;
     }
 
     /**
@@ -120,19 +123,41 @@ public class Elevator {
     }
 
     /**
-     * Retrieves which floors are serviced by the elevator.
-     * @return a list containing all floors which are serviced
-     */
-    public ArrayList<Floor> getFloorService() {
-        return floorService;
-    }
-
-    /**
      * Retrieves the weight of passengers on the elevator.
      * @return total weight of all passengers in lbs
      */
     public float getWeight() {
         return weight;
+    }
+
+    /**
+     * Provides the status of a floor request button on the elevator (on/off).
+     * @param floorNumber - floor number button being checked on the elevator
+     * @return returns boolean to indicate if floor button on the elevator is active (true) or not (false)
+     */
+    public boolean getElevatorButton(int floorNumber) {
+        Optional<Floor> floor = servicedFloors.stream()
+                .filter(f -> f.getNumber() == floorNumber)
+                .findFirst();
+
+        if(!floor.isPresent()) {
+            return false;
+        }
+
+        return floor.get().isDownButtonOn() || floor.get().isUpButtonOn();
+    }
+
+    /**
+     * Retrieves whether or not the elevator will service the specified floor (yes/no).
+     * @param floorNumber floor whose service status by the elevator is being retrieved
+     * @return service status whether the floor is serviced by the elevator (yes=true,no=false)
+     */
+    public boolean servicesFloor(int floorNumber) {
+        Optional<Floor> floor = servicedFloors.stream()
+                .filter(f -> f.getNumber() == floorNumber)
+                .findFirst();
+
+        return floor.isPresent();
     }
 
     /**
@@ -152,10 +177,26 @@ public class Elevator {
     }
 
     /**
-     * Sets which particular floors the elevator services.
-     * @param floorService the list of floors which should be serviced from the elevator
+     * Adds a particular floor to be serviced by the elevator.
+     * @param floor the flor which should be serviced from the elevator
      */
-    public void setFloorService(ArrayList<Floor> floorService) {
-        this.floorService = floorService;
+    public void addFloorService(Floor floor) {
+        servicedFloors.add(floor);
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
+
+    public void setAcceleration(float acceleration) {
+        this.acceleration = acceleration;
+    }
+
+    public void setCurrentPosition(Position currentPosition) {
+        this.currentPosition = currentPosition;
+    }
+
+    public void setDoorStatus(DoorStatus doorStatus) {
+        this.doorStatus = doorStatus;
     }
 }

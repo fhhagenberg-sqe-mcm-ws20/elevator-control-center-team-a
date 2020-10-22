@@ -6,10 +6,6 @@ public class Floor {
      *  Floor numbering starts at 0 for floor 1. */
     private int number = 0;
 
-    /** The height of the floor in feet.
-     * It is assumed that each floor is the same height. */
-    private float height = 0.0f;
-
     /** The down button of the floor.
      * For the purposes of passengers calling the elevator. */
     private Button downButton = new Button();
@@ -18,8 +14,8 @@ public class Floor {
      * For the purposes of passengers calling the elevator. */
     private Button upButton = new Button();
 
-    public Floor() {
-
+    public Floor(int number) {
+        this.number = number;
     }
 
     /**
@@ -35,22 +31,36 @@ public class Floor {
      * @return floor height (ft)
      */
     public float getHeight() {
-        return height;
+        return Building.FLOOR_HEIGHT;
     }
 
     /**
-     * Provides the down button of the floor.
-     * @return the down button of the floor
+     * Provides the status of the Down button on the floor (on/off).
+     * @return boolean to indicate if button is active (true) or not (false)
      */
-    public Button getDownButton() {
-        return downButton;
+    public boolean isDownButtonOn() {
+        return downButton.isOn();
     }
 
     /**
-     * Provides the up button of the floor.
-     * @return the up button of the floor
+     * Provides the status of the Up button on the floor (on/off).
+     * @return boolean to indicate if button is active (true) or not (false)
      */
-    public Button getUpButton() {
-        return upButton;
+    public boolean isUpButtonOn() {
+        return upButton.isOn();
+    }
+
+    /**
+     * Sets the status of the Down button on the floor to the opposite (on/off).
+     */
+    public void pressDownButton() {
+        downButton.press();
+    }
+
+    /**
+     * Sets the status of the Up button on the floor to the opposite (on/off).
+     */
+    public void pressUpButton() {
+        upButton.press();
     }
 }
