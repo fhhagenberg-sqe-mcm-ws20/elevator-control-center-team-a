@@ -1,4 +1,4 @@
-package at.fhhgb.team.a.elevators;
+package at.fhhgb.team.a.elevators.app;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
