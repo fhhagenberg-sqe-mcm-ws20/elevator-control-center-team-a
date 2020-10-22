@@ -147,10 +147,6 @@ public class ElevatorControlCenterTest {
             assertThat(thirdFloor.isUpButtonOn()).isFalse();
         }
 
-        //TODO new testcase
-        //            assertThat(firstElevator.getCurrentPosition().).isEqualTo(ELEVATOR_ACCELERATION);
-
-
         private void stubInitialElevatorState() throws RemoteException {
             Mockito.when(elevatorApi.getClockTick()).thenReturn(CLOCK_TICK);
             Mockito.when(elevatorApi.getFloorHeight()).thenReturn(FLOOR_HEIGHT);
@@ -169,7 +165,6 @@ public class ElevatorControlCenterTest {
             Mockito.when(elevatorApi.getElevatorWeight(anyInt())).thenReturn(CURRENT_ELEVATOR_WEIGHT);
             Mockito.when(elevatorApi.getServicesFloors(anyInt(), anyInt())).thenReturn(true);
         }
-
 
         private void stubMovingElevatorState() throws RemoteException {
             Mockito.when(elevatorApi.getClockTick()).thenReturn(CLOCK_TICK);
