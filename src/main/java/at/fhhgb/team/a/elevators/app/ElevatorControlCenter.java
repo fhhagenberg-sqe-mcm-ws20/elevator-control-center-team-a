@@ -1,6 +1,6 @@
 package at.fhhgb.team.a.elevators.app;
 
-import at.fhhgb.team.a.elevators.api.IElevator;
+import sqelevator.IElevator;
 import at.fhhgb.team.a.elevators.model.*;
 
 import java.rmi.Remote;

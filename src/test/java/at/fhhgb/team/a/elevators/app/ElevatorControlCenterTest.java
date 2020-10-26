@@ -1,6 +1,6 @@
 package at.fhhgb.team.a.elevators.app;
 
-import at.fhhgb.team.a.elevators.api.IElevator;
+import sqelevator.IElevator;
 import at.fhhgb.team.a.elevators.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
