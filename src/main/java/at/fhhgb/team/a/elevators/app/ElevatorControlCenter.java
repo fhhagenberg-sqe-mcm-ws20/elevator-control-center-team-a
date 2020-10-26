@@ -120,7 +120,8 @@ public class ElevatorControlCenter {
                 try {
                     boolean serviced = elevatorApi.getServicesFloors(e.getNumber(), f.getNumber());
                     if(serviced) {
-                        e.addFloorService(f);
+                        boolean pressed = elevatorApi.getElevatorButton(e.getNumber(), f.getNumber());
+                        e.addFloorService(f, pressed);
                     }
                 } catch (RemoteException ex) {
                     ex.printStackTrace();
