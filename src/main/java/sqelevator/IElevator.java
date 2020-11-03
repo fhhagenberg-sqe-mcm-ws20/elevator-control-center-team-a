@@ -22,7 +22,7 @@ package sqelevator;
  * at zero for elevator 1.</ul>
  * 
  * <p>Some elevator behavior is inherent and cannot be controlled:
- * <ul><i>Door opening & closing.</i> Elevator doors automatically open when arriving at a floor and 
+ * <ul><i>Door opening and closing.</i> Elevator doors automatically open when arriving at a floor and
  * close before departing. When passengers are waiting to board an elevator, the doors will 
  * stay open until all passengers are boarded. Each open and close action takes 1 second.</ul>
  * <ul><i>Elevator buttons.</i> Arriving passengers press the appropriate elevator button and the 
