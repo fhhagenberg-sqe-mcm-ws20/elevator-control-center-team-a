@@ -1,6 +1,7 @@
 package at.fhhgb.team.a.elevators.model;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Building {
@@ -8,17 +9,25 @@ public class Building {
     /** The height of all floors. */
     public static float FLOOR_HEIGHT = 500;
 
+    public void setFloors(List<Floor> floors) {
+        this.floors = floors;
+    }
+
+    public void setElevators(List<Elevator> elevators) {
+        this.elevators = elevators;
+    }
+
     /** The floors in the building, including the ground floor.
      * It is assumed there are no floors below ground level. */
-    private Set<Floor> floors;
+    private List<Floor> floors;
 
     /** The elevators in the building.
      * Elevator numbering starts at zero for elevator 1. */
-    private Set<Elevator> elevators;
+    private List<Elevator> elevators;
 
     public Building(float floorHeight,
-                    Set<Elevator> elevators,
-                    Set<Floor> floors) {
+                    List<Elevator> elevators,
+                    List<Floor> floors) {
         FLOOR_HEIGHT = floorHeight;
 
         this.elevators = elevators;
