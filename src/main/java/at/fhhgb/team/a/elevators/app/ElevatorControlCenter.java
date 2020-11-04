@@ -3,9 +3,7 @@ package at.fhhgb.team.a.elevators.app;
 import sqelevator.IElevator;
 import at.fhhgb.team.a.elevators.model.*;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.time.Clock;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -22,31 +20,45 @@ public class ElevatorControlCenter {
      */
     private Building building;
 
-    /**
-     * The clock tick of the elevator control center.
-     */
-    private long clockTick;
-
     public ElevatorControlCenter(IElevator elevatorApi) {
         this.elevatorApi = elevatorApi;
     }
 
     public void pollElevatorApi() throws RemoteException {
-        this.clockTick = elevatorApi.getClockTick();
-        updateBuilding();
+        long startTick = elevatorApi.getClockTick();
+        Building tempBuilding = constructBuilding();
+        long endTick = elevatorApi.getClockTick();
+
+        if(startTick == endTick) {
+            building = tempBuilding;
+
+        } else {
+            // ClockTick changed --> retry
+            pollElevatorApi();
+        }
+    }
+
+    public void updateBuilding() throws RemoteException {
+        if (null == building) {
+            // We need to create a building first before be can update it
+            pollElevatorApi();
+            return;
+        }
+
+        // TODO update building (only if clocktick does not change in the meantime)
     }
 
     public Building getBuilding() {
         return this.building;
     }
 
-    private void updateBuilding() throws RemoteException {
+    private Building constructBuilding() throws RemoteException {
+
         int floorHeight = elevatorApi.getFloorHeight();
         Set<Floor> floors = createFloors();
         Set<Elevator> elevators = createElevators(floors);
         addFloorServiceAssignments(elevators, floors);
-        Building building = new Building(floorHeight, elevators, floors);
-        this.building = building;
+        return new Building(floorHeight, elevators, floors);
     }
 
     private Set<Elevator> createElevators(Set<Floor> floors) throws RemoteException {
