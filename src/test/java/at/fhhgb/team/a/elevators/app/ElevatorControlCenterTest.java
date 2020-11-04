@@ -1,6 +1,6 @@
 package at.fhhgb.team.a.elevators.app;
 
-import at.fhhgb.team.a.elevators.api.IElevator;
+import sqelevator.IElevator;
 import at.fhhgb.team.a.elevators.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -68,7 +68,7 @@ public class ElevatorControlCenterTest {
 
         @Test
         @DisplayName("creates a building with the correct ground floor")
-        public void testIfGroundFloorIsCorrect() throws RemoteException {
+        public void testGroundFloorIsCorrect() throws RemoteException {
             stubInitialElevatorState();
             controlCenter.pollElevatorApi();
 
@@ -80,7 +80,7 @@ public class ElevatorControlCenterTest {
 
         @Test
         @DisplayName("creates a building with the correct elevators")
-        public void testIfElevatorsAreCorrect() throws RemoteException {
+        public void testElevatorsAreCorrect() throws RemoteException {
             stubInitialElevatorState();
             controlCenter.pollElevatorApi();
 
@@ -97,7 +97,7 @@ public class ElevatorControlCenterTest {
 
         @Test
         @DisplayName("creates a building with correct elevator floor service")
-        public void testIfElevatorsServiceCorrectFloors() throws RemoteException {
+        public void testElevatorsServiceCorrectFloors() throws RemoteException {
             stubMovingElevatorState();
             controlCenter.pollElevatorApi();
 
