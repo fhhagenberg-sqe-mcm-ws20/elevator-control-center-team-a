@@ -20,12 +20,23 @@ public class ElevatorControlCenter {
      */
     private Building building;
 
+    /**
+     * Tick of the last successful update
+     */
+    private long lastUpdateTick;
+
     public ElevatorControlCenter(IElevator elevatorApi) {
         this.elevatorApi = elevatorApi;
     }
 
     public void pollElevatorApi() throws RemoteException {
         long startTick = elevatorApi.getClockTick();
+
+        if(startTick == lastUpdateTick) {
+            // we already updated to that state
+            return;
+        }
+
         List<Floor> floors = createFloors();
         List<Elevator> elevators = createElevators(floors);
         addFloorServiceAssignments(elevators, floors);
@@ -37,6 +48,7 @@ public class ElevatorControlCenter {
             } else {
                 updateBuilding(floors, elevators);
             }
+            lastUpdateTick = startTick;
         } else {
             // ClockTick changed --> retry
             pollElevatorApi();
@@ -91,11 +103,13 @@ public class ElevatorControlCenter {
         int elevatorWeight = elevatorApi.getElevatorWeight(elevatorNumber);
         Position currentPosition = new Position(elevatorPosition, closestFloor.get());
 
-        Elevator elevator = new Elevator(elevatorNumber, elevatorCapacity, elevatorWeight, targetFloor.get(), currentPosition);
+        Elevator elevator = new Elevator(elevatorNumber, elevatorCapacity, elevatorWeight);
         elevator.setCommittedDirection(Direction.fromNumber(committedDirection));
         elevator.setSpeed(elevatorSpeed);
         elevator.setAcceleration(elevatorAccel);
         elevator.setDoorStatus(DoorStatus.fromNumber(elevatorDoorStatus));
+        elevator.setTarget(targetFloor.get());
+        elevator.setCurrentPosition(currentPosition);
         return elevator;
     }
 

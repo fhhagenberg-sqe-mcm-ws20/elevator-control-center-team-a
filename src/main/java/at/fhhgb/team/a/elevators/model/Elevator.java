@@ -47,14 +47,10 @@ public class Elevator {
 
     public Elevator(int number,
                     int capacity,
-                    float weight,
-                    Floor target,
-                    Position currentPosition) {
+                    float weight) {
         this.number = number;
         this.capacity = capacity;
         this.weight = weight;
-        this.target = target;
-        this.currentPosition = currentPosition;
     }
 
     /**

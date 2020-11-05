@@ -13,7 +13,6 @@ import org.testfx.matcher.control.LabeledMatchers;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
-@Disabled
 @ExtendWith(ApplicationExtension.class)
 public class AppTest {
     private Button button;
