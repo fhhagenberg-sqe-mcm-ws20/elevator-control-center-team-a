@@ -4,9 +4,9 @@ import sqelevator.IElevator;
 import at.fhhgb.team.a.elevators.model.*;
 
 import java.rmi.RemoteException;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public class ElevatorControlCenter {
 
@@ -20,49 +20,57 @@ public class ElevatorControlCenter {
      */
     private Building building;
 
+    /**
+     * Tick of the last successful update
+     */
+    private long lastUpdateTick;
+
     public ElevatorControlCenter(IElevator elevatorApi) {
         this.elevatorApi = elevatorApi;
     }
 
     public void pollElevatorApi() throws RemoteException {
         long startTick = elevatorApi.getClockTick();
-        Building tempBuilding = constructBuilding();
+
+        if(startTick == lastUpdateTick) {
+            // we already updated to that state
+            return;
+        }
+
+        List<Floor> floors = createFloors();
+        List<Elevator> elevators = createElevators(floors);
+        addFloorServiceAssignments(elevators, floors);
         long endTick = elevatorApi.getClockTick();
 
         if(startTick == endTick) {
-            building = tempBuilding;
-
+            if(building == null) {
+                building = createBuilding(floors, elevators);
+            } else {
+                updateBuilding(floors, elevators);
+            }
+            lastUpdateTick = startTick;
         } else {
             // ClockTick changed --> retry
             pollElevatorApi();
         }
     }
 
-    public void updateBuilding() throws RemoteException {
-        if (null == building) {
-            // We need to create a building first before be can update it
-            pollElevatorApi();
-            return;
-        }
-
-        // TODO update building (only if clocktick does not change in the meantime)
+    public void updateBuilding(List<Floor> floors, List<Elevator> elevators) {
+        building.setFloors(floors);
+        building.setElevators(elevators);
     }
 
     public Building getBuilding() {
         return this.building;
     }
 
-    private Building constructBuilding() throws RemoteException {
-
+    private Building createBuilding(List<Floor> floors, List<Elevator> elevators) throws RemoteException {
         int floorHeight = elevatorApi.getFloorHeight();
-        Set<Floor> floors = createFloors();
-        Set<Elevator> elevators = createElevators(floors);
-        addFloorServiceAssignments(elevators, floors);
         return new Building(floorHeight, elevators, floors);
     }
 
-    private Set<Elevator> createElevators(Set<Floor> floors) throws RemoteException {
-        Set<Elevator> elevators = new HashSet<>();
+    private List<Elevator> createElevators(List<Floor> floors) throws RemoteException {
+        List<Elevator> elevators = new ArrayList<>();
         int elevatorNum = elevatorApi.getElevatorNum();
 
         for(int i = 0; i < elevatorNum; i ++) {
@@ -75,7 +83,7 @@ public class ElevatorControlCenter {
         return elevators;
     }
 
-    private Elevator createElevator(Set<Floor> floors, int elevatorNumber) throws RemoteException {
+    private Elevator createElevator(List<Floor> floors, int elevatorNumber) throws RemoteException {
         int target = elevatorApi.getTarget(elevatorNumber);
         int elevatorFloor = elevatorApi.getElevatorFloor(elevatorNumber);
         Optional<Floor> targetFloor = floors.stream().filter(f -> f.getNumber() == target).findFirst();
@@ -95,16 +103,18 @@ public class ElevatorControlCenter {
         int elevatorWeight = elevatorApi.getElevatorWeight(elevatorNumber);
         Position currentPosition = new Position(elevatorPosition, closestFloor.get());
 
-        Elevator elevator = new Elevator(elevatorNumber, elevatorCapacity, elevatorWeight, targetFloor.get(), currentPosition);
+        Elevator elevator = new Elevator(elevatorNumber, elevatorCapacity, elevatorWeight);
         elevator.setCommittedDirection(Direction.fromNumber(committedDirection));
         elevator.setSpeed(elevatorSpeed);
         elevator.setAcceleration(elevatorAccel);
         elevator.setDoorStatus(DoorStatus.fromNumber(elevatorDoorStatus));
+        elevator.setTarget(targetFloor.get());
+        elevator.setCurrentPosition(currentPosition);
         return elevator;
     }
 
-    private Set<Floor> createFloors() throws RemoteException {
-        Set<Floor> floors = new HashSet<>();
+    private List<Floor> createFloors() throws RemoteException {
+        List<Floor> floors = new ArrayList<>();
         int floorNum = elevatorApi.getFloorNum();
         for(int i = 0; i < floorNum; i ++) {
             boolean buttonDown = elevatorApi.getFloorButtonDown(i);
@@ -126,7 +136,7 @@ public class ElevatorControlCenter {
         return floors;
     }
 
-    private void addFloorServiceAssignments(Set<Elevator> elevators, Set<Floor> floors){
+    private void addFloorServiceAssignments(List<Elevator> elevators, List<Floor> floors){
         floors.stream().forEach(f -> {
             elevators.stream().forEach(e -> {
                 try {
