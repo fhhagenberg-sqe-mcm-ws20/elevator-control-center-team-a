@@ -1,6 +1,6 @@
 package at.fhhgb.team.a.elevators.app;
 
-import at.fhhgb.team.a.elevators.api.IElevator;
+import sqelevator.IElevator;
 import at.fhhgb.team.a.elevators.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,21 +16,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 @DisplayName("For any ElevatorControlCenter instance")
 public class ElevatorControlCenterTest {
 
-    static long CLOCK_TICK = 1L;
-    static int FLOOR_HEIGHT = 3;
-    static int NUMBER_OF_FLOORS = 3;
-    static int NUMBER_OF_ELEVATORS = 2;
-    static int TARGET_FLOOR_NUMBER = 0;
-    static int CURR_ELEVATOR_FLOOR_0 = 0;
-    static int CURR_ELEVATOR_FLOOR_1 = 1;
-    static int CURR_ELEVATOR_POS_FEET_0 = 0;
-    static int CURR_ELEVATOR_POS_FEET_2 = 2;
-    static int CURR_ELEVATOR_SPEED_0 = 0;
-    static int CURR_ELEVATOR_SPEED_1 = 1;
-    static int CURRENT_ELEVATOR_WEIGHT = 0;
-    static int ELEVATOR_ACCELERATION = 0;
-    static int ELEVATOR_CAPACITY = 5;
-
     @Nested
     @DisplayName("assert that pollElevatorApi")
     public class PollElevatorApi {
@@ -39,66 +24,107 @@ public class ElevatorControlCenterTest {
         ElevatorControlCenter controlCenter;
 
         @BeforeEach
-        public void setUp() {
+        void setUp() {
             elevatorApi = Mockito.mock(IElevator.class);
             controlCenter = new ElevatorControlCenter(elevatorApi);
         }
 
         @Test
         @DisplayName("creates a building with the correct number of Floors")
-        public void testNumberOfFloors() throws RemoteException {
-            stubInitialElevatorState();
+        void testNumberOfFloors() throws RemoteException {
+            int numberOfFloors = 2;
+
+            Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
+            Mockito.when(elevatorApi.getFloorNum()).thenReturn(numberOfFloors);
+
             controlCenter.pollElevatorApi();
 
             Building building = controlCenter.getBuilding();
 
-            assertThat(building.getFloorNum()).isEqualTo(NUMBER_OF_FLOORS);
+            assertThat(building.getFloorNum()).isEqualTo(numberOfFloors);
         }
 
         @Test
         @DisplayName("creates a building with the correct number of Elevators")
-        public void testNumberOfElevators() throws RemoteException {
-            stubInitialElevatorState();
+        void testNumberOfElevators() throws RemoteException {
+            int numberOfElevators = 2;
+
+            Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
+            Mockito.when(elevatorApi.getElevatorNum()).thenReturn(numberOfElevators);
+            Mockito.when(elevatorApi.getFloorNum()).thenReturn(1);
+
             controlCenter.pollElevatorApi();
 
             Building building = controlCenter.getBuilding();
 
-            assertThat(building.getElevatorNum()).isEqualTo(NUMBER_OF_ELEVATORS);
+            assertThat(building.getElevatorNum()).isEqualTo(numberOfElevators);
         }
 
         @Test
         @DisplayName("creates a building with the correct ground floor")
-        public void testIfGroundFloorIsCorrect() throws RemoteException {
-            stubInitialElevatorState();
+        void testGroundFloorIsCorrect() throws RemoteException {
+            int floorHeight = 100;
+            int groundFloorNum = 0;
+
+            Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
+            Mockito.when(elevatorApi.getFloorHeight()).thenReturn(floorHeight);
+            Mockito.when(elevatorApi.getFloorNum()).thenReturn(1);
             controlCenter.pollElevatorApi();
 
-            Floor groundFloor = controlCenter.getBuilding().getFloor(0);
+            Floor groundFloor = controlCenter.getBuilding().getFloor(groundFloorNum);
 
-            assertThat(groundFloor.getNumber()).isEqualTo(0);
-            assertThat(groundFloor.getHeight()).isEqualTo(FLOOR_HEIGHT);
+            assertThat(groundFloor.getNumber()).isEqualTo(groundFloorNum);
+            assertThat(groundFloor.getHeight()).isEqualTo(floorHeight);
         }
 
         @Test
         @DisplayName("creates a building with the correct elevators")
-        public void testIfElevatorsAreCorrect() throws RemoteException {
-            stubInitialElevatorState();
+        void testElevatorsAreCorrect() throws RemoteException {
+            int capacity = 100;
+            int speed = 10;
+            int acceleration = 5;
+            DoorStatus doorStatus = DoorStatus.closing;
+            Direction direction = Direction.down;
+            int weight = 5;
+            int elevatorNumber = 0;
+
+            Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
+            Mockito.when(elevatorApi.getFloorNum()).thenReturn(1);
+            Mockito.when(elevatorApi.getElevatorNum()).thenReturn(1);
+            Mockito.when(elevatorApi.getCommittedDirection(anyInt())).thenReturn(direction.number);
+            Mockito.when(elevatorApi.getElevatorAccel(anyInt())).thenReturn(acceleration);
+            Mockito.when(elevatorApi.getElevatorCapacity(anyInt())).thenReturn(capacity);
+            Mockito.when(elevatorApi.getElevatorDoorStatus(anyInt())).thenReturn(doorStatus.number);
+            Mockito.when(elevatorApi.getElevatorSpeed(anyInt())).thenReturn(speed);
+            Mockito.when(elevatorApi.getElevatorWeight(anyInt())).thenReturn(weight);
+            Mockito.when(elevatorApi.getServicesFloors(anyInt(), anyInt())).thenReturn(true);
+
             controlCenter.pollElevatorApi();
 
-            Elevator firstElevator = controlCenter.getBuilding().getElevator(0);
+            Elevator firstElevator = controlCenter.getBuilding().getElevator(elevatorNumber);
 
-            assertThat(firstElevator.getNumber()).isEqualTo(0);
-            assertThat(firstElevator.getCapacity()).isEqualTo(ELEVATOR_CAPACITY);
-            assertThat(firstElevator.getSpeed()).isEqualTo(CURR_ELEVATOR_SPEED_0);
-            assertThat(firstElevator.getAcceleration()).isEqualTo(ELEVATOR_ACCELERATION);
-            assertThat(firstElevator.getDoorStatus()).isEqualTo(DoorStatus.closed);
-            assertThat(firstElevator.getCommittedDirection()).isEqualTo(Direction.uncommitted);
-            assertThat(firstElevator.getWeight()).isEqualTo(CURRENT_ELEVATOR_WEIGHT);
+            assertThat(firstElevator.getNumber()).isEqualTo(elevatorNumber);
+            assertThat(firstElevator.getCapacity()).isEqualTo(capacity);
+            assertThat(firstElevator.getSpeed()).isEqualTo(speed);
+            assertThat(firstElevator.getAcceleration()).isEqualTo(acceleration);
+            assertThat(firstElevator.getDoorStatus()).isEqualTo(doorStatus);
+            assertThat(firstElevator.getCommittedDirection()).isEqualTo(direction);
+            assertThat(firstElevator.getWeight()).isEqualTo(weight);
         }
 
         @Test
         @DisplayName("creates a building with correct elevator floor service")
-        public void testIfElevatorsServiceCorrectFloors() throws RemoteException {
-            stubMovingElevatorState();
+        void testElevatorsServiceCorrectFloors() throws RemoteException {
+            Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
+            Mockito.when(elevatorApi.getFloorNum()).thenReturn(3);
+            Mockito.when(elevatorApi.getElevatorNum()).thenReturn(2);
+            Mockito.when(elevatorApi.getServicesFloors(0, 0)).thenReturn(true);
+            Mockito.when(elevatorApi.getServicesFloors(0, 1)).thenReturn(false);
+            Mockito.when(elevatorApi.getServicesFloors(0, 2)).thenReturn(true);
+            Mockito.when(elevatorApi.getServicesFloors(1, 0)).thenReturn(true);
+            Mockito.when(elevatorApi.getServicesFloors(1, 1)).thenReturn(true);
+            Mockito.when(elevatorApi.getServicesFloors(1, 2)).thenReturn(false);
+
             controlCenter.pollElevatorApi();
 
             Elevator firstElevator = controlCenter.getBuilding().getElevator(0);
@@ -114,25 +140,99 @@ public class ElevatorControlCenterTest {
 
         @Test
         @DisplayName("creates a building with correct elevator position")
-        public void testForCorrectElevatorPosition() throws RemoteException {
-            stubMovingElevatorState();
+        void testForCorrectElevatorPosition() throws RemoteException {
+            int positionInFeet0 = 0;
+            int positionInFeet1 = 50;
+            int currentFloorElevator0 = 0;
+            int currentFloorElevator1 = 1;
+            int speedElevator0 = 10;
+            int speedElevator1 = 20;
+
+            Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
+            Mockito.when(elevatorApi.getFloorHeight()).thenReturn(100);
+            Mockito.when(elevatorApi.getFloorNum()).thenReturn(2);
+            Mockito.when(elevatorApi.getElevatorNum()).thenReturn(2);
+            Mockito.when(elevatorApi.getElevatorFloor(0)).thenReturn(currentFloorElevator0);
+            Mockito.when(elevatorApi.getElevatorFloor(1)).thenReturn(currentFloorElevator1);
+            Mockito.when(elevatorApi.getElevatorPosition(0)).thenReturn(positionInFeet0);
+            Mockito.when(elevatorApi.getElevatorPosition(1)).thenReturn(positionInFeet1);
+            Mockito.when(elevatorApi.getElevatorSpeed(0)).thenReturn(speedElevator0);
+            Mockito.when(elevatorApi.getElevatorSpeed(1)).thenReturn(speedElevator1);
+
             controlCenter.pollElevatorApi();
 
             Elevator firstElevator = controlCenter.getBuilding().getElevator(0);
             Elevator secondElevator = controlCenter.getBuilding().getElevator(1);
 
-            assertThat(firstElevator.getCurrentPosition().getClosestFloor().getNumber()).isEqualTo(CURR_ELEVATOR_FLOOR_0);
-            assertThat(secondElevator.getCurrentPosition().getClosestFloor().getNumber()).isEqualTo(CURR_ELEVATOR_FLOOR_1);
-            assertThat(firstElevator.getCurrentPosition().getPositionFeet()).isEqualTo(CURR_ELEVATOR_POS_FEET_0);
-            assertThat(secondElevator.getCurrentPosition().getPositionFeet()).isEqualTo(CURR_ELEVATOR_POS_FEET_2);
-            assertThat(firstElevator.getSpeed()).isEqualTo(CURR_ELEVATOR_SPEED_0);
-            assertThat(secondElevator.getSpeed()).isEqualTo(CURR_ELEVATOR_SPEED_1);
+            assertThat(firstElevator.getCurrentPosition().getClosestFloor().getNumber()).isEqualTo(currentFloorElevator0);
+            assertThat(secondElevator.getCurrentPosition().getClosestFloor().getNumber()).isEqualTo(currentFloorElevator1);
+            assertThat(firstElevator.getCurrentPosition().getPositionFeet()).isEqualTo(positionInFeet0);
+            assertThat(secondElevator.getCurrentPosition().getPositionFeet()).isEqualTo(positionInFeet1);
+            assertThat(firstElevator.getSpeed()).isEqualTo(speedElevator0);
+            assertThat(secondElevator.getSpeed()).isEqualTo(speedElevator1);
+        }
+
+        @Test
+        @DisplayName("updates a building on the next clock tick")
+        void testForUpdatedElevatorWithNewTick() throws RemoteException {
+            Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
+            Mockito.when(elevatorApi.getFloorNum()).thenReturn(1);
+            controlCenter.pollElevatorApi();
+
+            Floor firstFloor = controlCenter.getBuilding().getFloor(0);
+            assertThat(firstFloor.getNumber()).isZero();
+            Floor secondFloor = controlCenter.getBuilding().getFloor(1);
+            assertThat(secondFloor).isNull();
+
+            Mockito.when(elevatorApi.getClockTick()).thenReturn(2L);
+            Mockito.when(elevatorApi.getFloorNum()).thenReturn(2);
+            controlCenter.pollElevatorApi();
+
+            secondFloor = controlCenter.getBuilding().getFloor(1);
+            assertThat(secondFloor.getNumber()).isEqualTo(1);
+        }
+
+        @Test
+        @DisplayName("skips update on same clock tick")
+        void testForSkippedUpdateWhenTickDidNotChange() throws RemoteException {
+            Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
+            Mockito.when(elevatorApi.getFloorNum()).thenReturn(1);
+            controlCenter.pollElevatorApi();
+
+            Floor secondFloor = controlCenter.getBuilding().getFloor(1);
+            assertThat(secondFloor).isNull();
+
+            Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
+            Mockito.when(elevatorApi.getFloorNum()).thenReturn(2);
+            controlCenter.pollElevatorApi();
+
+            secondFloor = controlCenter.getBuilding().getFloor(1);
+            assertThat(secondFloor).isNull();
+        }
+
+        @Test
+        @DisplayName("retries update when clock tick changes in between processing")
+        void testForUpdatedElevatorWithChangingTickBetweenUpdate() throws RemoteException {
+            Mockito.when(elevatorApi.getClockTick()).thenReturn(1L).thenReturn(2L);
+            Mockito.when(elevatorApi.getFloorNum()).thenReturn(1).thenReturn(2);
+            controlCenter.pollElevatorApi();
+
+            Floor secondFloor = controlCenter.getBuilding().getFloor(1);
+            assertThat(secondFloor.getNumber()).isEqualTo(1);
         }
 
         @Test
         @DisplayName("creates a building with correct floor buttons")
-        public void testForCorrectFloorButtons() throws RemoteException {
-            stubMovingElevatorState();
+        void testForCorrectFloorButtons() throws RemoteException {
+            Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
+            Mockito.when(elevatorApi.getFloorNum()).thenReturn(3);
+            Mockito.when(elevatorApi.getFloorButtonDown(0)).thenReturn(false);
+            Mockito.when(elevatorApi.getFloorButtonDown(1)).thenReturn(true);
+            Mockito.when(elevatorApi.getFloorButtonDown(2)).thenReturn(false);
+            Mockito.when(elevatorApi.getFloorButtonUp(0)).thenReturn(true);
+            Mockito.when(elevatorApi.getFloorButtonUp(1)).thenReturn(false);
+            Mockito.when(elevatorApi.getFloorButtonUp(2)).thenReturn(false);
+
             controlCenter.pollElevatorApi();
 
             Floor firstFloor = controlCenter.getBuilding().getFloor(0);
@@ -147,54 +247,28 @@ public class ElevatorControlCenterTest {
             assertThat(thirdFloor.isUpButtonOn()).isFalse();
         }
 
-        private void stubInitialElevatorState() throws RemoteException {
-            Mockito.when(elevatorApi.getClockTick()).thenReturn(CLOCK_TICK);
-            Mockito.when(elevatorApi.getFloorHeight()).thenReturn(FLOOR_HEIGHT);
-            Mockito.when(elevatorApi.getFloorNum()).thenReturn(NUMBER_OF_FLOORS);
-            Mockito.when(elevatorApi.getFloorButtonDown(anyInt())).thenReturn(false);
-            Mockito.when(elevatorApi.getFloorButtonUp(anyInt())).thenReturn(false);
-            Mockito.when(elevatorApi.getElevatorNum()).thenReturn(NUMBER_OF_ELEVATORS);
-            Mockito.when(elevatorApi.getTarget(anyInt())).thenReturn(TARGET_FLOOR_NUMBER);
-            Mockito.when(elevatorApi.getElevatorFloor(anyInt())).thenReturn(CURR_ELEVATOR_FLOOR_0);
-            Mockito.when(elevatorApi.getCommittedDirection(anyInt())).thenReturn(Direction.uncommitted.number);
-            Mockito.when(elevatorApi.getElevatorAccel(anyInt())).thenReturn(ELEVATOR_ACCELERATION);
-            Mockito.when(elevatorApi.getElevatorCapacity(anyInt())).thenReturn(ELEVATOR_CAPACITY);
-            Mockito.when(elevatorApi.getElevatorDoorStatus(anyInt())).thenReturn(DoorStatus.closed.number);
-            Mockito.when(elevatorApi.getElevatorPosition(anyInt())).thenReturn(CURR_ELEVATOR_POS_FEET_0);
-            Mockito.when(elevatorApi.getElevatorSpeed(anyInt())).thenReturn(CURR_ELEVATOR_SPEED_0);
-            Mockito.when(elevatorApi.getElevatorWeight(anyInt())).thenReturn(CURRENT_ELEVATOR_WEIGHT);
-            Mockito.when(elevatorApi.getServicesFloors(anyInt(), anyInt())).thenReturn(true);
-        }
+        @Test
+        @DisplayName("creates a building with a targeted elevator")
+        void testForCorrectTarget() throws RemoteException {
+            int targetFloorNumber = 0;
+            int elevatorNumber = 1;
+            boolean downButtonPressedOnTargetFloor = true;
 
-        private void stubMovingElevatorState() throws RemoteException {
-            Mockito.when(elevatorApi.getClockTick()).thenReturn(CLOCK_TICK);
-            Mockito.when(elevatorApi.getFloorHeight()).thenReturn(FLOOR_HEIGHT);
-            Mockito.when(elevatorApi.getFloorNum()).thenReturn(NUMBER_OF_FLOORS);
-            Mockito.when(elevatorApi.getFloorButtonDown(0)).thenReturn(false);
-            Mockito.when(elevatorApi.getFloorButtonDown(1)).thenReturn(true);
-            Mockito.when(elevatorApi.getFloorButtonDown(2)).thenReturn(false);
-            Mockito.when(elevatorApi.getFloorButtonUp(0)).thenReturn(true);
-            Mockito.when(elevatorApi.getFloorButtonUp(1)).thenReturn(false);
-            Mockito.when(elevatorApi.getFloorButtonUp(1)).thenReturn(false);
-            Mockito.when(elevatorApi.getElevatorNum()).thenReturn(NUMBER_OF_ELEVATORS);
-            Mockito.when(elevatorApi.getTarget(anyInt())).thenReturn(TARGET_FLOOR_NUMBER);
-            Mockito.when(elevatorApi.getElevatorFloor(0)).thenReturn(CURR_ELEVATOR_FLOOR_0);
-            Mockito.when(elevatorApi.getElevatorFloor(1)).thenReturn(CURR_ELEVATOR_FLOOR_1);
-            Mockito.when(elevatorApi.getCommittedDirection(anyInt())).thenReturn(Direction.uncommitted.number);
-            Mockito.when(elevatorApi.getElevatorAccel(anyInt())).thenReturn(ELEVATOR_ACCELERATION);
-            Mockito.when(elevatorApi.getElevatorCapacity(anyInt())).thenReturn(ELEVATOR_CAPACITY);
-            Mockito.when(elevatorApi.getElevatorDoorStatus(anyInt())).thenReturn(DoorStatus.closed.number);
-            Mockito.when(elevatorApi.getElevatorPosition(0)).thenReturn(CURR_ELEVATOR_POS_FEET_0);
-            Mockito.when(elevatorApi.getElevatorPosition(1)).thenReturn(CURR_ELEVATOR_POS_FEET_2);
-            Mockito.when(elevatorApi.getElevatorSpeed(0)).thenReturn(CURR_ELEVATOR_SPEED_0);
-            Mockito.when(elevatorApi.getElevatorSpeed(1)).thenReturn(CURR_ELEVATOR_SPEED_1);
-            Mockito.when(elevatorApi.getElevatorWeight(anyInt())).thenReturn(CURRENT_ELEVATOR_WEIGHT);
-            Mockito.when(elevatorApi.getServicesFloors(0, 0)).thenReturn(true);
-            Mockito.when(elevatorApi.getServicesFloors(0, 1)).thenReturn(false);
-            Mockito.when(elevatorApi.getServicesFloors(0, 2)).thenReturn(true);
-            Mockito.when(elevatorApi.getServicesFloors(1, 0)).thenReturn(true);
-            Mockito.when(elevatorApi.getServicesFloors(1, 1)).thenReturn(true);
-            Mockito.when(elevatorApi.getServicesFloors(1, 2)).thenReturn(false);
+            Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
+            Mockito.when(elevatorApi.getFloorNum()).thenReturn(2);
+            Mockito.when(elevatorApi.getElevatorNum()).thenReturn(2);
+            Mockito.when(elevatorApi.getServicesFloors(elevatorNumber, targetFloorNumber)).thenReturn(true);
+            Mockito.when(elevatorApi.getElevatorButton(elevatorNumber, targetFloorNumber)).thenReturn(downButtonPressedOnTargetFloor);
+            Mockito.when(elevatorApi.getTarget(elevatorNumber)).thenReturn(targetFloorNumber);
+
+            controlCenter.pollElevatorApi();
+
+            Elevator elevator = controlCenter.getBuilding().getElevator(elevatorNumber);
+            Floor target = elevator.getTarget();
+            boolean downButtonPressed = elevator.getElevatorButton(target.getNumber());
+
+            assertThat(target.getNumber()).isEqualTo(targetFloorNumber);
+            assertThat(downButtonPressed).isEqualTo(downButtonPressedOnTargetFloor);
         }
     }
 }

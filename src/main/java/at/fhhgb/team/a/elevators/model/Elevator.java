@@ -1,8 +1,8 @@
 package at.fhhgb.team.a.elevators.model;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Represents an elevator used in the system
@@ -35,11 +35,10 @@ public class Elevator {
      * down or uncommitted committed direction set in response to passenger travel. */
     private Direction committedDirection = Direction.uncommitted;
 
-    /** Whether a particular elevator services a particular floor.
-     * When elevators are allowed to only service certain floors,
-     * this can help to achieve greater passenger service.
+    /** Contains all serviced Floors {@link Floor} as Key and the state of the
+     * Button {@link Boolean} in the Elevator.
      * Every elevator must service the ground floor. */
-    private final Set<Floor> servicedFloors = new HashSet<>();
+    private final Map<Floor, Boolean> elevatorButtons = new HashMap<>();
 
     /** This provides the current weight of the elevator less the weight of the empty elevator –
      * hence the weight of the passengers on board.
@@ -48,14 +47,10 @@ public class Elevator {
 
     public Elevator(int number,
                     int capacity,
-                    float weight,
-                    Floor target,
-                    Position currentPosition) {
+                    float weight) {
         this.number = number;
         this.capacity = capacity;
         this.weight = weight;
-        this.target = target;
-        this.currentPosition = currentPosition;
     }
 
     /**
@@ -136,15 +131,15 @@ public class Elevator {
      * @return returns boolean to indicate if floor button on the elevator is active (true) or not (false)
      */
     public boolean getElevatorButton(int floorNumber) {
-        Optional<Floor> floor = servicedFloors.stream()
+        Optional<Floor> floor = elevatorButtons.keySet().stream()
                 .filter(f -> f.getNumber() == floorNumber)
                 .findFirst();
 
-        if(!floor.isPresent()) {
+        if (!floor.isPresent()) {
             return false;
         }
 
-        return floor.get().isDownButtonOn() || floor.get().isUpButtonOn();
+        return elevatorButtons.get(floor.get());
     }
 
     /**
@@ -153,11 +148,8 @@ public class Elevator {
      * @return service status whether the floor is serviced by the elevator (yes=true,no=false)
      */
     public boolean servicesFloor(int floorNumber) {
-        Optional<Floor> floor = servicedFloors.stream()
-                .filter(f -> f.getNumber() == floorNumber)
-                .findFirst();
-
-        return floor.isPresent();
+        return elevatorButtons.keySet().stream()
+                .anyMatch(f -> f.getNumber() == floorNumber);
     }
 
     /**
@@ -178,10 +170,11 @@ public class Elevator {
 
     /**
      * Adds a particular floor to be serviced by the elevator.
-     * @param floor the flor which should be serviced from the elevator
+     * @param floor the floor which should be serviced from the elevator
+     * @param pressed the status of the button for the specified floor
      */
-    public void addFloorService(Floor floor) {
-        servicedFloors.add(floor);
+    public void addFloorService(Floor floor, boolean pressed) {
+        elevatorButtons.put(floor, pressed);
     }
 
     public void setSpeed(float speed) {
