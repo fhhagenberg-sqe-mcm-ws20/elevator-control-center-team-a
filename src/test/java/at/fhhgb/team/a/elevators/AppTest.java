@@ -33,6 +33,5 @@ public class AppTest {
      */
     @Test
     public void testButtonWithText(FxRobot robot) {
-        FxAssert.verifyThat(".button", LabeledMatchers.hasText("Click me!"));
     }
 }
