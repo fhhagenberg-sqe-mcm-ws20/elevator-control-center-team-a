@@ -1,14 +1,18 @@
 package at.fhhgb.team.a.elevators.model;
 
+import javafx.scene.image.Image;
+
 public enum Direction {
-    up(0),
-    down(1),
-    uncommitted(2);
+    up(0, new Image("images/up-arrow.png")),
+    down(1, new Image("images/down-arrow.png")),
+    uncommitted(2, new Image("images/right-arrow.png"));
 
     public final int number;
+    public final Image image;
 
-    Direction(int number) {
+    Direction(int number, Image image) {
         this.number = number;
+        this.image = image;
     }
 
     /**

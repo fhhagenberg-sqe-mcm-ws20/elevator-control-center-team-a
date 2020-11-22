@@ -1,24 +1,20 @@
 package at.fhhgb.team.a.elevators.view;
 
-import at.fhhgb.team.a.elevators.model.Building;
-import at.fhhgb.team.a.elevators.model.Elevator;
+import at.fhhgb.team.a.elevators.viewmodels.BuildingViewModel;
 import javafx.geometry.Insets;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
-import java.util.List;
-
 public class ElevatorsView extends VBox {
-    public ElevatorsView(Building building) {
+    public ElevatorsView(BuildingViewModel viewModel) {
         super();
-        initializeView(building);
+        initializeView(viewModel);
     }
 
-    private void initializeView(Building building) {
+    private void initializeView(BuildingViewModel viewModel) {
         this.setWidth(640);
 
         var title = new Text("Elevators");
@@ -31,6 +27,6 @@ public class ElevatorsView extends VBox {
         elevatorsPane.setHgap(16);
         elevatorsPane.setVgap(16);
         this.getChildren().add(elevatorsPane);
-        building.getElevators().forEach((elevator) -> elevatorsPane.getChildren().add(new ElevatorView(elevator, building.getFloors())));
+        viewModel.getElevators().forEach((elevatorViewModel) -> elevatorsPane.getChildren().add(new ElevatorView(elevatorViewModel)));
     }
 }

@@ -1,20 +1,14 @@
 package at.fhhgb.team.a.elevators.view;
 
-import at.fhhgb.team.a.elevators.model.Floor;
+import at.fhhgb.team.a.elevators.viewmodels.BuildingViewModel;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
-import java.util.Comparator;
-import java.util.List;
-
 public class FloorsView extends VBox {
-    public FloorsView(List<Floor> floors) {
+    public FloorsView(BuildingViewModel viewModel) {
         super();
         this.setPadding(new Insets(16,0,0,0));
 
@@ -23,7 +17,7 @@ public class FloorsView extends VBox {
         this.getChildren().add(title);
         this.setSpacing(12);
 
-        floors.sort(Comparator.comparing(Floor::getNumber).reversed());
+        /*floors.sort(Comparator.comparing(Floor::getNumber).reversed());
         for (Floor floor : floors) {
             var hbox = new HBox();
             var floorText = new Text("Floor 1");
@@ -49,6 +43,6 @@ public class FloorsView extends VBox {
             hbox.setBackground(new Background(new BackgroundFill(Color.rgb(242, 242, 242), new CornerRadii(8), Insets.EMPTY)));
 
             this.getChildren().add(hbox);
-        }
+        }*/
     }
 }
