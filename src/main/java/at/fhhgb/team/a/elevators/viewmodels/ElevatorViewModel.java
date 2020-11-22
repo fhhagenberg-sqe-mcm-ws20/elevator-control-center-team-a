@@ -30,7 +30,7 @@ public class ElevatorViewModel {
         String titleString = "Elevator " + elevator.getNumber();
         title = new SimpleStringProperty(titleString);
 
-        var image = new Image("");
+        var image = new Image("images/up-arrow.png");
 
         switch (elevator.getCommittedDirection()) {
             case up:
