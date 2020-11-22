@@ -15,7 +15,7 @@ import javafx.scene.paint.Paint;
 
 public class ElevatorFloorViewModel {
 
-    public Floor floor;
+    private Floor floor;
 
     private StringProperty title;
     private ObjectProperty<Paint> titleFill;

@@ -1,11 +1,16 @@
 package at.fhhgb.team.a.elevators.view;
 
 import at.fhhgb.team.a.elevators.viewmodels.BuildingViewModel;
+import at.fhhgb.team.a.elevators.viewmodels.FloorViewModel;
 import javafx.geometry.Insets;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+
+import java.util.Comparator;
 
 public class FloorsView extends VBox {
     public FloorsView(BuildingViewModel viewModel) {
@@ -17,32 +22,38 @@ public class FloorsView extends VBox {
         this.getChildren().add(title);
         this.setSpacing(12);
 
-        /*floors.sort(Comparator.comparing(Floor::getNumber).reversed());
-        for (Floor floor : floors) {
+        var floors = viewModel.getFloors();
+        floors.sort(Comparator.comparing(FloorViewModel::getNumber).reversed());
+        for (FloorViewModel floorViewModel : floors) {
             var hbox = new HBox();
             var floorText = new Text("Floor 1");
+            floorText.textProperty().bind(floorViewModel.getTitle());
             floorText.setFont(Font.font("Arial", FontWeight.SEMI_BOLD, 12));
             hbox.getChildren().add(floorText);
 
-            var buttonImage1 = new ImageView("images/up-chevron.png");
-            buttonImage1.setFitHeight(12);
-            buttonImage1.setFitWidth(12);
-            hbox.getChildren().add(buttonImage1);
+            var upButtonImageView = new ImageView("images/up-chevron.png");
+            upButtonImageView.setFitHeight(12);
+            upButtonImageView.setFitWidth(12);
 
+            var stackButtonUp = new StackPane(upButtonImageView);
+            stackButtonUp.setPadding(new Insets(4));
+            stackButtonUp.backgroundProperty().bind(floorViewModel.getUpButtonBackground());
+            hbox.getChildren().add(stackButtonUp);
 
-            var buttonImage2 = new ImageView("images/down-chevron.png");
-            buttonImage2.setFitHeight(12);
-            buttonImage2.setFitWidth(12);
-            var stackButton2 = new StackPane(buttonImage2);
-            stackButton2.setPadding(new Insets(4));
-            stackButton2.setBackground(new Background(new BackgroundFill(Color.rgb(123, 206, 123), new CornerRadii(8), Insets.EMPTY)));
-            hbox.getChildren().add(stackButton2);
+            var downButtonImageView = new ImageView("images/down-chevron.png");
+            downButtonImageView.setFitHeight(12);
+            downButtonImageView.setFitWidth(12);
+
+            var stackButtonDown = new StackPane(downButtonImageView);
+            stackButtonDown.setPadding(new Insets(4));
+            stackButtonDown.backgroundProperty().bind(floorViewModel.getDownButtonBackground());
+            hbox.getChildren().add(stackButtonDown);
 
             hbox.setSpacing(8);
             hbox.setPadding(new Insets(8));
             hbox.setBackground(new Background(new BackgroundFill(Color.rgb(242, 242, 242), new CornerRadii(8), Insets.EMPTY)));
 
             this.getChildren().add(hbox);
-        }*/
+        }
     }
 }

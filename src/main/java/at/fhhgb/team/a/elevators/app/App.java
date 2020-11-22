@@ -49,6 +49,11 @@ public class App extends Application {
         elevators.get(3).setCurrentPosition(currentPosition);
         elevators.get(3).setTarget(floors.get(0));
 
+        floors.get(0).pressDownButton();
+        floors.get(0).pressUpButton();
+        floors.get(1).pressDownButton();
+        floors.get(2).pressUpButton();
+
         var building = new Building(10, elevators, floors);
 
         var viewModel = new BuildingViewModel(building);
