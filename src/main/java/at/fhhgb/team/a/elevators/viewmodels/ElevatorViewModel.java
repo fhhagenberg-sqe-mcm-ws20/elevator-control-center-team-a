@@ -30,7 +30,21 @@ public class ElevatorViewModel {
         String titleString = "Elevator " + elevator.getNumber();
         title = new SimpleStringProperty(titleString);
 
-        direction = new SimpleObjectProperty<>(elevator.getCommittedDirection().image);
+        var image = new Image("");
+
+        switch (elevator.getCommittedDirection()) {
+            case up:
+                image = new Image("images/up-arrow.png");
+                break;
+            case down:
+                image = new Image("images/down-arrow.png");
+                break;
+            case uncommitted:
+                image = new Image("images/right-arrow.png");
+                break;
+        }
+
+        direction = new SimpleObjectProperty<>(image);
 
         String speedString = "speed: " + elevator.getSpeed() + " km/h";
         speed = new SimpleStringProperty(speedString);
