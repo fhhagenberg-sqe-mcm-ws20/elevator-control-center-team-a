@@ -15,7 +15,13 @@ import javafx.scene.paint.Paint;
 
 public class ElevatorFloorViewModel {
 
-    private Floor floor;
+    private final Floor floor;
+    private final Elevator elevator;
+
+    private final BackgroundFill serviceBackgroundFill;
+    private final BackgroundFill noServiceBackgroundFill;
+    private final BackgroundFill targetBackgroundFill;
+    private final BackgroundFill currentBackgroundFill;
 
     private StringProperty title;
     private ObjectProperty<Paint> titleFill;
@@ -23,6 +29,7 @@ public class ElevatorFloorViewModel {
 
     public ElevatorFloorViewModel(Elevator elevator, Floor floor) {
         this.floor = floor;
+        this.elevator = elevator;
 
         String titleString = String.valueOf(floor.getNumber());
         title = new SimpleStringProperty(titleString);
@@ -31,10 +38,10 @@ public class ElevatorFloorViewModel {
         titleFill = new SimpleObjectProperty<>(color);
 
         CornerRadii cornerRadii = new CornerRadii(4);
-        BackgroundFill serviceBackgroundFill = new BackgroundFill(Color.rgb(255, 255, 255), cornerRadii, Insets.EMPTY);
-        BackgroundFill noServiceBackgroundFill = new BackgroundFill(Color.rgb(210, 213, 217), cornerRadii, Insets.EMPTY);
-        BackgroundFill targetBackgroundFill = new BackgroundFill(Color.rgb(123, 206, 123), cornerRadii, Insets.EMPTY);
-        BackgroundFill currentBackgroundFill = new BackgroundFill(Color.rgb(255, 255, 83), cornerRadii, Insets.EMPTY);
+        serviceBackgroundFill = new BackgroundFill(Color.rgb(255, 255, 255), cornerRadii, Insets.EMPTY);
+        noServiceBackgroundFill = new BackgroundFill(Color.rgb(210, 213, 217), cornerRadii, Insets.EMPTY);
+        targetBackgroundFill = new BackgroundFill(Color.rgb(123, 206, 123), cornerRadii, Insets.EMPTY);
+        currentBackgroundFill = new BackgroundFill(Color.rgb(255, 255, 83), cornerRadii, Insets.EMPTY);
 
         BackgroundFill backgroundFill = elevator.servicesFloor(floor.getNumber()) ? serviceBackgroundFill : noServiceBackgroundFill;
 
@@ -48,6 +55,16 @@ public class ElevatorFloorViewModel {
 
         Background background = new Background(backgroundFill);
         buttonBackground = new SimpleObjectProperty<>(background);
+    }
+
+    public void onTargetFloorChanged() {
+        BackgroundFill backgroundFill = elevator.servicesFloor(floor.getNumber()) ? serviceBackgroundFill : noServiceBackgroundFill;
+        backgroundFill = elevator.getTarget() == floor ? targetBackgroundFill : backgroundFill;
+        buttonBackground.setValue(new Background(backgroundFill));
+    }
+
+    public Floor getFloor() {
+        return floor;
     }
 
     public int getNumber() {

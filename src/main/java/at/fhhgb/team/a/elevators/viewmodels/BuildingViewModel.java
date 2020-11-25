@@ -9,7 +9,7 @@ import java.util.List;
 
 public class BuildingViewModel {
 
-    private Building building;
+    private final Building building;
 
     public BuildingViewModel(Building building) {
         this.building = building;

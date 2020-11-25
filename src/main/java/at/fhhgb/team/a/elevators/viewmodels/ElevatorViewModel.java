@@ -70,6 +70,11 @@ public class ElevatorViewModel {
         return viewModels;
     }
 
+    public void onFloorButtonPressed(ElevatorFloorViewModel floorViewModel) {
+        elevator.setTarget(floorViewModel.getFloor());
+        floorViewModel.onTargetFloorChanged();
+    }
+
     public StringProperty getTitle() {
         return title;
     }
