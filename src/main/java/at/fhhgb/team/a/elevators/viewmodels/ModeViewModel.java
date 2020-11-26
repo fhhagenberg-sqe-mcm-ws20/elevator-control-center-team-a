@@ -14,6 +14,10 @@ public class ModeViewModel {
         mode.modeButtonPressed();
     }
 
+    public boolean isManualModeEnabled() {
+        return !mode.isAutomaticModeEnabled();
+    }
+
     public String getButtonText() {
         if (mode.isAutomaticModeEnabled()) {
             return "Auto";

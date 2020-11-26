@@ -10,7 +10,6 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 
 public class FloorViewModel {
 
@@ -38,6 +37,10 @@ public class FloorViewModel {
 
         Background backgroundDown = new Background(backgroundFillDown);
         downButtonBackground = new SimpleObjectProperty<>(backgroundDown);
+    }
+
+    public Floor getFloor() {
+        return floor;
     }
 
     public int getNumber() {

@@ -23,19 +23,13 @@ public class ElevatorFloorViewModel {
     private final BackgroundFill targetBackgroundFill;
     private final BackgroundFill currentBackgroundFill;
 
-    private StringProperty title;
-    private ObjectProperty<Paint> titleFill;
-    private ObjectProperty<Background> buttonBackground;
+    private final StringProperty title;
+    private final ObjectProperty<Paint> titleFill;
+    private final ObjectProperty<Background> buttonBackground;
 
     public ElevatorFloorViewModel(Elevator elevator, Floor floor) {
         this.floor = floor;
         this.elevator = elevator;
-
-        String titleString = String.valueOf(floor.getNumber());
-        title = new SimpleStringProperty(titleString);
-
-        Paint color = elevator.getElevatorButton(floor.getNumber()) ? Color.GREEN : Color.BLACK;
-        titleFill = new SimpleObjectProperty<>(color);
 
         CornerRadii cornerRadii = new CornerRadii(4);
         serviceBackgroundFill = new BackgroundFill(Color.rgb(255, 255, 255), cornerRadii, Insets.EMPTY);
@@ -43,24 +37,19 @@ public class ElevatorFloorViewModel {
         targetBackgroundFill = new BackgroundFill(Color.rgb(123, 206, 123), cornerRadii, Insets.EMPTY);
         currentBackgroundFill = new BackgroundFill(Color.rgb(255, 255, 83), cornerRadii, Insets.EMPTY);
 
-        BackgroundFill backgroundFill = elevator.servicesFloor(floor.getNumber()) ? serviceBackgroundFill : noServiceBackgroundFill;
+        String titleString = String.valueOf(floor.getNumber());
+        title = new SimpleStringProperty(titleString);
 
-        if (elevator.getTarget() != null) {
-            backgroundFill = elevator.getTarget() == floor ? targetBackgroundFill : backgroundFill;
-        }
+        Paint color = elevator.getElevatorButton(floor.getNumber()) ? Color.GREEN : Color.BLACK;
+        titleFill = new SimpleObjectProperty<>(color);
 
-        if (elevator.getCurrentPosition() != null) {
-            backgroundFill = elevator.getCurrentPosition().getClosestFloor() == floor ? currentBackgroundFill : backgroundFill;
-        }
-
-        Background background = new Background(backgroundFill);
+        Background background = getBackgroundFor(elevator, floor);
         buttonBackground = new SimpleObjectProperty<>(background);
     }
 
     public void onTargetFloorChanged() {
-        BackgroundFill backgroundFill = elevator.servicesFloor(floor.getNumber()) ? serviceBackgroundFill : noServiceBackgroundFill;
-        backgroundFill = elevator.getTarget() == floor ? targetBackgroundFill : backgroundFill;
-        buttonBackground.setValue(new Background(backgroundFill));
+        Background newBackground = getBackgroundFor(elevator, floor);
+        buttonBackground.setValue(newBackground);
     }
 
     public Floor getFloor() {
@@ -81,5 +70,18 @@ public class ElevatorFloorViewModel {
 
     public ObjectProperty<Background> getButtonBackground() {
         return buttonBackground;
+    }
+
+    private Background getBackgroundFor(Elevator elevator, Floor floor) {
+        BackgroundFill backgroundFill = elevator.servicesFloor(floor.getNumber()) ? serviceBackgroundFill : noServiceBackgroundFill;
+
+        if (elevator.getTarget() != null) {
+            backgroundFill = elevator.getTarget() == floor ? targetBackgroundFill : backgroundFill;
+        }
+
+        if (elevator.getCurrentPosition() != null) {
+            backgroundFill = elevator.getCurrentPosition().getClosestFloor() == floor ? currentBackgroundFill : backgroundFill;
+        }
+        return new Background(backgroundFill);
     }
 }

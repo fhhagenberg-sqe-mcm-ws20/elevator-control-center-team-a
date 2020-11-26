@@ -16,11 +16,16 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 import java.util.Comparator;
+import java.util.List;
 
 public class ElevatorView extends HBox {
 
-    public ElevatorView(ElevatorViewModel viewModel) {
+    private final List<ElevatorFloorViewModel> elevatorFloorViewModelList;
+
+    public ElevatorView(ElevatorViewModel viewModel, List<ElevatorFloorViewModel> elevatorFloorVM) {
         super();
+        this.elevatorFloorViewModelList = elevatorFloorVM;
+
         this.getChildren().add(createInformationalColumn(viewModel));
         this.getChildren().add(createFloorColumn(viewModel));
 
@@ -33,9 +38,8 @@ public class ElevatorView extends HBox {
         var vbox = new VBox();
         vbox.setSpacing(2);
 
-        var floors = viewModel.getFloors();
-        floors.sort(Comparator.comparing(ElevatorFloorViewModel::getNumber).reversed());
-        for (ElevatorFloorViewModel floorViewModel : floors) {
+        elevatorFloorViewModelList.sort(Comparator.comparing(ElevatorFloorViewModel::getNumber).reversed());
+        for (ElevatorFloorViewModel floorViewModel : elevatorFloorViewModelList) {
             var floorButton = new Button();
             floorButton.idProperty().bind(floorViewModel.getTitle());
             floorButton.textProperty().bind(floorViewModel.getTitle());
@@ -96,6 +100,5 @@ class ElevatorButtonClickEvent extends ActionEvent {
 
     public void onClicked(MouseEvent event) {
         elevatorViewModel.onFloorButtonPressed(floorViewModel);
-        System.out.println(floorViewModel.getTitle().get());
     }
 }

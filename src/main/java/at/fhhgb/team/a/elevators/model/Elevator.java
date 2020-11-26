@@ -1,8 +1,6 @@
 package at.fhhgb.team.a.elevators.model;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Represents an elevator used in the system
@@ -191,5 +189,9 @@ public class Elevator {
 
     public void setDoorStatus(DoorStatus doorStatus) {
         this.doorStatus = doorStatus;
+    }
+
+    public List<Floor> getFloors() {
+        return new ArrayList<>(elevatorButtons.keySet());
     }
 }

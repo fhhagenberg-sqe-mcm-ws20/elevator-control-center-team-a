@@ -1,17 +1,13 @@
 package at.fhhgb.team.a.elevators;
 
 import at.fhhgb.team.a.elevators.app.App;
-import org.junit.jupiter.api.Disabled;
+import javafx.scene.control.Button;
+import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.api.FxAssert;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
-import org.testfx.matcher.control.LabeledMatchers;
-
-import javafx.scene.control.Button;
-import javafx.stage.Stage;
 
 @ExtendWith(ApplicationExtension.class)
 public class AppTest {

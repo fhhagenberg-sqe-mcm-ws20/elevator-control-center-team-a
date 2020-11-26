@@ -1,31 +1,26 @@
 package at.fhhgb.team.a.elevators.viewmodels;
 
 import at.fhhgb.team.a.elevators.model.Elevator;
-import at.fhhgb.team.a.elevators.model.Floor;
+import at.fhhgb.team.a.elevators.provider.ViewModelProvider;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ElevatorViewModel {
 
-    private Elevator elevator;
-    private List<Floor> floors;
+    private final Elevator elevator;
 
-    private StringProperty title;
-    private ObjectProperty<Image> direction;
-    private StringProperty speed;
-    private StringProperty capacity;
-    private StringProperty weight;
-    private StringProperty doorStatus;
+    private final StringProperty title;
+    private final ObjectProperty<Image> direction;
+    private final StringProperty speed;
+    private final StringProperty capacity;
+    private final StringProperty weight;
+    private final StringProperty doorStatus;
 
-    public ElevatorViewModel(Elevator elevator, List<Floor> floors) {
+    public ElevatorViewModel(Elevator elevator) {
         this.elevator = elevator;
-        this.floors = floors;
 
         String titleString = "Elevator " + elevator.getNumber();
         title = new SimpleStringProperty(titleString);
@@ -59,20 +54,15 @@ public class ElevatorViewModel {
         doorStatus = new SimpleStringProperty(doorStatusString);
     }
 
-    public List<ElevatorFloorViewModel> getFloors() {
-        ArrayList<ElevatorFloorViewModel> viewModels = new ArrayList<>();
-
-        for (Floor floor: floors) {
-            ElevatorFloorViewModel viewModel = new ElevatorFloorViewModel(elevator, floor);
-            viewModels.add(viewModel);
+    public void onFloorButtonPressed(ElevatorFloorViewModel pressedFloorVM) {
+        ModeViewModel modeViewModel = ViewModelProvider.getInstance().getModeViewModel();
+        if(modeViewModel.isManualModeEnabled()) {
+            var oldFloorVM =
+                    ViewModelProvider.getInstance().getElevatorFloorViewModel(elevator, elevator.getTarget());
+            elevator.setTarget(pressedFloorVM.getFloor());
+            pressedFloorVM.onTargetFloorChanged();
+            oldFloorVM.onTargetFloorChanged();
         }
-
-        return viewModels;
-    }
-
-    public void onFloorButtonPressed(ElevatorFloorViewModel floorViewModel) {
-        elevator.setTarget(floorViewModel.getFloor());
-        floorViewModel.onTargetFloorChanged();
     }
 
     public StringProperty getTitle() {
@@ -97,5 +87,12 @@ public class ElevatorViewModel {
 
     public StringProperty getDoorStatus() {
         return doorStatus;
+    }
+    public Elevator getElevator() {
+        return elevator;
+    }
+
+    public int getElevatorNumber() {
+        return elevator.getNumber();
     }
 }

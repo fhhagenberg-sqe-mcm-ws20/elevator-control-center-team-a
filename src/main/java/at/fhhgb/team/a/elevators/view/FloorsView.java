@@ -1,6 +1,5 @@
 package at.fhhgb.team.a.elevators.view;
 
-import at.fhhgb.team.a.elevators.viewmodels.BuildingViewModel;
 import at.fhhgb.team.a.elevators.viewmodels.FloorViewModel;
 import javafx.geometry.Insets;
 import javafx.scene.image.ImageView;
@@ -11,9 +10,10 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 import java.util.Comparator;
+import java.util.List;
 
 public class FloorsView extends VBox {
-    public FloorsView(BuildingViewModel viewModel) {
+    public FloorsView(List<FloorViewModel> viewModels) {
         super();
         this.setPadding(new Insets(16,0,0,0));
 
@@ -22,9 +22,8 @@ public class FloorsView extends VBox {
         this.getChildren().add(title);
         this.setSpacing(12);
 
-        var floors = viewModel.getFloors();
-        floors.sort(Comparator.comparing(FloorViewModel::getNumber).reversed());
-        for (FloorViewModel floorViewModel : floors) {
+        viewModels.sort(Comparator.comparing(FloorViewModel::getNumber).reversed());
+        for (FloorViewModel floorViewModel : viewModels) {
             var hbox = new HBox();
             var floorText = new Text("Floor 1");
             floorText.textProperty().bind(floorViewModel.getTitle());
