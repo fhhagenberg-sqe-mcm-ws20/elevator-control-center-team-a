@@ -17,16 +17,12 @@ public class ViewModelProvider {
 
     private static ViewModelProvider instance;
 
-    private ViewModelFactory viewModelFactory;
-
-    private ModeViewModel modeViewModel;
-
     private final Map<Elevator, ElevatorViewModel> elevatorViewModelSet;
-    private final Map<Elevator, Map<Floor,ElevatorFloorViewModel>> elevatorFloorViewModelSet;
+    private final Map<Elevator, Map<Floor, ElevatorFloorViewModel>> elevatorFloorViewModelSet;
     private final Map<Floor, FloorViewModel> floorViewModelSet;
 
-    private ElevatorFloorViewModel elevatorFloorViewModel = null;
-
+    private ViewModelFactory viewModelFactory;
+    private ModeViewModel modeViewModel;
 
     private ViewModelProvider() {
         modeViewModel = null;
@@ -55,20 +51,18 @@ public class ViewModelProvider {
     }
 
     public List<ElevatorViewModel> getElevatorViewModelList() {
-        if(elevatorViewModelSet.isEmpty()) {
-            viewModelFactory.createAllElevatorViewModels().forEach(viewModel -> {
-                elevatorViewModelSet.put(viewModel.getElevator(), viewModel);
-            });
+        if (elevatorViewModelSet.isEmpty()) {
+            viewModelFactory.createAllElevatorViewModels().forEach(viewModel ->
+                    elevatorViewModelSet.put(viewModel.getElevator(), viewModel));
         }
 
         return new ArrayList<>(elevatorViewModelSet.values());
     }
 
     public List<FloorViewModel> getFloorViewModelList() {
-        if(floorViewModelSet.isEmpty()) {
-            viewModelFactory.createAllFloorViewModels().forEach(viewModel -> {
-                floorViewModelSet.put(viewModel.getFloor(), viewModel);
-            });
+        if (floorViewModelSet.isEmpty()) {
+            viewModelFactory.createAllFloorViewModels().forEach(viewModel ->
+                    floorViewModelSet.put(viewModel.getFloor(), viewModel));
         }
 
         return new ArrayList<>(floorViewModelSet.values());

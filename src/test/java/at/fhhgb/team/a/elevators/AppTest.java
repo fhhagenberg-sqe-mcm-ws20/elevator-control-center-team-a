@@ -9,6 +9,10 @@ import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
+import static org.testfx.api.FxAssert.verifyThat;
+import static org.testfx.util.NodeQueryUtils.hasText;
+import static org.testfx.util.NodeQueryUtils.isVisible;
+
 @ExtendWith(ApplicationExtension.class)
 public class AppTest {
     private Button button;
@@ -29,5 +33,12 @@ public class AppTest {
      */
     @Test
     public void testButtonWithText(FxRobot robot) {
+        verifyThat("#modeButton", isVisible());
+        verifyThat("#modeButton", hasText("Auto"));
+
+        robot.clickOn("#modeButton");
+
+        verifyThat("#modeButton", isVisible());
+        verifyThat("#modeButton", hasText("Manual"));
     }
 }

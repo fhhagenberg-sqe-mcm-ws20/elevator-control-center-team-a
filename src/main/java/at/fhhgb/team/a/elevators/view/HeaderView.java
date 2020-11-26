@@ -22,6 +22,7 @@ public class HeaderView extends BorderPane {
 
     private void initializeView() {
         Button modeButton = new Button();
+        modeButton.setId("modeButton");
         modeButton.setText(modeViewModel.getButtonText());
         modeButton.setOnMouseClicked(this::onMouseClickEvent);
 

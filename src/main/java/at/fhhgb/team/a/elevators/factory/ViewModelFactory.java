@@ -46,9 +46,7 @@ public class ViewModelFactory {
 
     public Map<Elevator, Map<Floor, ElevatorFloorViewModel>> createAllElevatorFloorViewModels() {
         Map<Elevator, Map<Floor,ElevatorFloorViewModel>> map = new HashMap<>();
-        building.getElevators().forEach(elevator -> {
-            map.put(elevator, createElevatorFloorViewModelFor(elevator));
-        });
+        building.getElevators().forEach(elevator -> map.put(elevator, createElevatorFloorViewModelFor(elevator)));
         return map;
     }
 

@@ -29,6 +29,6 @@ public class ElevatorsView extends VBox {
         elevatorsPane.setVgap(16);
         this.getChildren().add(elevatorsPane);
 
-        elevatorViews.forEach((elevatorView) -> elevatorsPane.getChildren().add(elevatorView));
+        elevatorViews.forEach(elevatorView -> elevatorsPane.getChildren().add(elevatorView));
     }
 }
