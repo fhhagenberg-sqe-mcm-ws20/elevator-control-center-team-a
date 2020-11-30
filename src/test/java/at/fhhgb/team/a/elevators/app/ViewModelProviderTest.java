@@ -1,7 +1,6 @@
 package at.fhhgb.team.a.elevators.app;
 
 import at.fhhgb.team.a.elevators.factory.ViewModelFactory;
-import at.fhhgb.team.a.elevators.model.Building;
 import at.fhhgb.team.a.elevators.model.Elevator;
 import at.fhhgb.team.a.elevators.model.Floor;
 import at.fhhgb.team.a.elevators.provider.ViewModelProvider;
@@ -9,7 +8,6 @@ import at.fhhgb.team.a.elevators.viewmodels.ElevatorFloorViewModel;
 import at.fhhgb.team.a.elevators.viewmodels.ElevatorViewModel;
 import at.fhhgb.team.a.elevators.viewmodels.FloorViewModel;
 import at.fhhgb.team.a.elevators.viewmodels.ModeViewModel;
-import javafx.scene.layout.Pane;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -22,11 +20,12 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 class ViewModelProviderTest {
     ViewModelFactory viewModelFactory;
+    ViewModelProvider viewModelProvider;
 
     @BeforeEach
     void setUp() {
         viewModelFactory = Mockito.mock(ViewModelFactory.class);
-        ViewModelProvider.getInstance().init(viewModelFactory);
+        viewModelProvider = new ViewModelProvider(viewModelFactory);
     }
 
     @Test
@@ -34,7 +33,7 @@ class ViewModelProviderTest {
         var floors = new ArrayList<FloorViewModel>();
         floors.add(Mockito.mock(FloorViewModel.class));
         Mockito.when(viewModelFactory.createAllFloorViewModels()).thenReturn(floors);
-        var providedViewModels = ViewModelProvider.getInstance().getFloorViewModelList();
+        var providedViewModels = viewModelProvider.getFloorViewModelList();
         assertThat(providedViewModels.size()).isEqualTo(floors.size());
     }
 
@@ -43,7 +42,7 @@ class ViewModelProviderTest {
         var elevators = new ArrayList<ElevatorViewModel>();
         elevators.add(Mockito.mock(ElevatorViewModel.class));
         Mockito.when(viewModelFactory.createAllElevatorViewModels()).thenReturn(elevators);
-        var providedViewModels = ViewModelProvider.getInstance().getElevatorViewModelList();
+        var providedViewModels = viewModelProvider.getElevatorViewModelList();
         assertThat(providedViewModels.size()).isEqualTo(elevators.size());
     }
 
@@ -57,10 +56,10 @@ class ViewModelProviderTest {
         elevatorMap.put(elevator, floorMap);
         Mockito.when(viewModelFactory.createAllElevatorFloorViewModels()).thenReturn(elevatorMap);
 
-        var providedViewModelsForElevator = ViewModelProvider.getInstance().getElevatorFloorViewModelList(elevator);
+        var providedViewModelsForElevator = viewModelProvider.getElevatorFloorViewModelList(elevator);
         assertThat(providedViewModelsForElevator.size()).isEqualTo(1);
 
-        var providedViewModelsForFloorAndElevator = ViewModelProvider.getInstance().getElevatorFloorViewModel(elevator, floor);
+        var providedViewModelsForFloorAndElevator = viewModelProvider.getElevatorFloorViewModel(elevator, floor);
         assertThat(providedViewModelsForFloorAndElevator).isNotNull();
     }
 
@@ -69,7 +68,7 @@ class ViewModelProviderTest {
         var mode = Mockito.mock(ModeViewModel.class);
         Mockito.when(mode.isManualModeEnabled()).thenReturn(true);
         Mockito.when(viewModelFactory.createModeViewModel()).thenReturn(mode);
-        var providedViewModel = ViewModelProvider.getInstance().getModeViewModel();
+        var providedViewModel = viewModelProvider.getModeViewModel();
         assertThat(providedViewModel.isManualModeEnabled()).isEqualTo(mode.isManualModeEnabled());
     }
 }

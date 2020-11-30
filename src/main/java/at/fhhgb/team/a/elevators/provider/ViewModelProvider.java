@@ -15,31 +15,19 @@ import java.util.Map;
 
 public class ViewModelProvider {
 
-    private static ViewModelProvider instance;
-
     private final Map<Elevator, ElevatorViewModel> elevatorViewModelSet;
     private final Map<Elevator, Map<Floor, ElevatorFloorViewModel>> elevatorFloorViewModelSet;
     private final Map<Floor, FloorViewModel> floorViewModelSet;
+    private final ViewModelFactory viewModelFactory;
 
-    private ViewModelFactory viewModelFactory;
     private ModeViewModel modeViewModel;
 
-    private ViewModelProvider() {
+    public ViewModelProvider(ViewModelFactory viewModelFactory) {
+        this.viewModelFactory = viewModelFactory;
         modeViewModel = null;
         elevatorViewModelSet = new HashMap<>();
         elevatorFloorViewModelSet = new HashMap<>();
         floorViewModelSet = new HashMap<>();
-    }
-
-    public static ViewModelProvider getInstance() {
-        if (null == instance) {
-            instance = new ViewModelProvider();
-        }
-        return instance;
-    }
-
-    public void init(ViewModelFactory viewModelFactory) {
-        this.viewModelFactory = viewModelFactory;
     }
 
     public ModeViewModel getModeViewModel() {

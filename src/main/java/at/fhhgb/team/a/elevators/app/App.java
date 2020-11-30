@@ -71,16 +71,15 @@ public class App extends Application {
         var building = new Building(10, elevators, floors);
 
         ViewModelFactory viewModelFactory = new ViewModelFactory(building);
-        ViewModelProvider.getInstance().init(viewModelFactory);
+        ViewModelProvider viewModelProvider = new ViewModelProvider(viewModelFactory);
 
-
-        var modeViewModel = ViewModelProvider.getInstance().getModeViewModel();
+        var modeViewModel = viewModelProvider.getModeViewModel();
         var headerView = new HeaderView(modeViewModel);
 
-        var elevatorViews = initElevatorViews();
+        var elevatorViews = initElevatorViews(viewModelProvider);
         var elevatorsView = new ElevatorsView(elevatorViews);
 
-        var floorViewModels = ViewModelProvider.getInstance().getFloorViewModelList();
+        var floorViewModels = viewModelProvider.getFloorViewModelList();
         var floorsView = new FloorsView(floorViewModels);
 
         var buildingView = new BuildingView(elevatorsView, floorsView);
@@ -96,13 +95,13 @@ public class App extends Application {
         stage.show();
     }
 
-    private List<ElevatorView> initElevatorViews() {
+    private List<ElevatorView> initElevatorViews(ViewModelProvider viewModelProvider) {
         List<ElevatorView> elevatorViews = new ArrayList<>();
-        var elevatorVMs = ViewModelProvider.getInstance().getElevatorViewModelList();
+        var elevatorVMs = viewModelProvider.getElevatorViewModelList();
         elevatorVMs.sort(Comparator.comparing(ElevatorViewModel::getElevatorNumber));
         elevatorVMs.forEach(elevatorViewModel -> {
             var elevatorFloorVM =
-                    ViewModelProvider.getInstance().getElevatorFloorViewModelList(elevatorViewModel.getElevator());
+                    viewModelProvider.getElevatorFloorViewModelList(elevatorViewModel.getElevator());
             elevatorViews.add(new ElevatorView(elevatorViewModel, elevatorFloorVM));
         });
         return elevatorViews;

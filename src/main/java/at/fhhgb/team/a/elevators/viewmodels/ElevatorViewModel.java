@@ -1,7 +1,7 @@
 package at.fhhgb.team.a.elevators.viewmodels;
 
+import at.fhhgb.team.a.elevators.model.ECCMode;
 import at.fhhgb.team.a.elevators.model.Elevator;
-import at.fhhgb.team.a.elevators.provider.ViewModelProvider;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -11,6 +11,7 @@ import javafx.scene.image.Image;
 public class ElevatorViewModel {
 
     private final Elevator elevator;
+    private final ECCMode eccMode;
 
     private final StringProperty title;
     private final ObjectProperty<Image> direction;
@@ -19,8 +20,9 @@ public class ElevatorViewModel {
     private final StringProperty weight;
     private final StringProperty doorStatus;
 
-    public ElevatorViewModel(Elevator elevator) {
+    public ElevatorViewModel(Elevator elevator, ECCMode eccMode) {
         this.elevator = elevator;
+        this.eccMode = eccMode;
 
         String titleString = "Elevator " + elevator.getNumber();
         title = new SimpleStringProperty(titleString);
@@ -60,13 +62,9 @@ public class ElevatorViewModel {
     }
 
     public void onFloorButtonPressed(ElevatorFloorViewModel pressedFloorVM) {
-        ModeViewModel modeViewModel = ViewModelProvider.getInstance().getModeViewModel();
-        if(modeViewModel.isManualModeEnabled()) {
-            var oldFloorVM =
-                    ViewModelProvider.getInstance().getElevatorFloorViewModel(elevator, elevator.getTarget());
+        if(!eccMode.isAutomaticModeEnabled()) {
             elevator.setTarget(pressedFloorVM.getFloor());
             pressedFloorVM.onTargetFloorChanged();
-            oldFloorVM.onTargetFloorChanged();
         }
     }
 

@@ -30,7 +30,7 @@ public class ViewModelFactory {
 
 
     public ElevatorViewModel createElevatorViewModel(Elevator elevator) {
-        return new ElevatorViewModel(elevator);
+        return new ElevatorViewModel(elevator, eccMode);
     }
     public List<ElevatorViewModel> createAllElevatorViewModels() {
         List<ElevatorViewModel> list = new ArrayList<>();
