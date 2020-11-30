@@ -34,7 +34,7 @@ public class ViewModelFactory {
     }
     public List<ElevatorViewModel> createAllElevatorViewModels() {
         List<ElevatorViewModel> list = new ArrayList<>();
-        building.getElevators().forEach(elevator -> list.add(new ElevatorViewModel(elevator)));
+        building.getElevators().forEach(elevator -> list.add(createElevatorViewModel(elevator)));
         return list;
     }
 

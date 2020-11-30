@@ -25,18 +25,23 @@ public class ElevatorViewModel {
         String titleString = "Elevator " + elevator.getNumber();
         title = new SimpleStringProperty(titleString);
 
-        var image = new Image("images/up-arrow.png");
+        Image image = null;
+        try {
+            image = new Image("images/up-arrow.png");
 
-        switch (elevator.getCommittedDirection()) {
-            case up:
-                image = new Image("images/up-arrow.png");
-                break;
-            case down:
-                image = new Image("images/down-arrow.png");
-                break;
-            case uncommitted:
-                image = new Image("images/right-arrow.png");
-                break;
+            switch (elevator.getCommittedDirection()) {
+                case up:
+                    image = new Image("images/up-arrow.png");
+                    break;
+                case down:
+                    image = new Image("images/down-arrow.png");
+                    break;
+                case uncommitted:
+                    image = new Image("images/right-arrow.png");
+                    break;
+            }
+        } catch (RuntimeException e) {
+            System.out.println("Cannot load image - JavaFX not initialized");
         }
 
         direction = new SimpleObjectProperty<>(image);

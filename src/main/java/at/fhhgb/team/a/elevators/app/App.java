@@ -42,13 +42,12 @@ public class App extends Application {
         elevators.get(0).setTarget(floors.get(3));
         elevators.get(0).addFloorService(floors.get(0), false);
         elevators.get(0).addFloorService(floors.get(1), false);
-        elevators.get(0).addFloorService(floors.get(2), false);
-        elevators.get(0).addFloorService(floors.get(3), false);
+        elevators.get(0).addFloorService(floors.get(2), true);
+        elevators.get(0).addFloorService(floors.get(3), true);
 
         elevators.get(1).setCurrentPosition(currentPosition);
         elevators.get(1).setTarget(floors.get(2));
         elevators.get(1).addFloorService(floors.get(0), false);
-        elevators.get(1).addFloorService(floors.get(1), false);
         elevators.get(1).addFloorService(floors.get(2), false);
         elevators.get(1).addFloorService(floors.get(3), false);
 
@@ -62,8 +61,6 @@ public class App extends Application {
         elevators.get(3).setCurrentPosition(currentPosition);
         elevators.get(3).setTarget(floors.get(0));
         elevators.get(3).addFloorService(floors.get(0), false);
-        elevators.get(3).addFloorService(floors.get(1), false);
-        elevators.get(3).addFloorService(floors.get(2), false);
         elevators.get(3).addFloorService(floors.get(3), false);
 
         floors.get(0).pressDownButton();
@@ -93,7 +90,7 @@ public class App extends Application {
         layout.getChildren().add(headerView);
         layout.getChildren().add(buildingView);
 
-        var scene = new Scene(layout, 640, 480);
+        var scene = new Scene(layout, 640, 660);
 
         stage.setScene(scene);
         stage.show();

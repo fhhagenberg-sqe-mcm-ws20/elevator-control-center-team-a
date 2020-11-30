@@ -2,6 +2,7 @@ package at.fhhgb.team.a.elevators.viewmodels;
 
 import at.fhhgb.team.a.elevators.model.Elevator;
 import at.fhhgb.team.a.elevators.model.Floor;
+import at.fhhgb.team.a.elevators.view.Colors;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -32,10 +33,10 @@ public class ElevatorFloorViewModel {
         this.elevator = elevator;
 
         CornerRadii cornerRadii = new CornerRadii(4);
-        serviceBackgroundFill = new BackgroundFill(Color.rgb(255, 255, 255), cornerRadii, Insets.EMPTY);
-        noServiceBackgroundFill = new BackgroundFill(Color.rgb(210, 213, 217), cornerRadii, Insets.EMPTY);
-        targetBackgroundFill = new BackgroundFill(Color.rgb(123, 206, 123), cornerRadii, Insets.EMPTY);
-        currentBackgroundFill = new BackgroundFill(Color.rgb(255, 255, 83), cornerRadii, Insets.EMPTY);
+        serviceBackgroundFill = new BackgroundFill(Colors.serviceWhite, cornerRadii, Insets.EMPTY);
+        noServiceBackgroundFill = new BackgroundFill(Colors.noServiceGray, cornerRadii, Insets.EMPTY);
+        targetBackgroundFill = new BackgroundFill(Colors.targetGreen, cornerRadii, Insets.EMPTY);
+        currentBackgroundFill = new BackgroundFill(Colors.currentYellow, cornerRadii, Insets.EMPTY);
 
         String titleString = String.valueOf(floor.getNumber());
         title = new SimpleStringProperty(titleString);
