@@ -20,7 +20,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-public class ViewModelProviderTest {
+class ViewModelProviderTest {
     ViewModelFactory viewModelFactory;
 
     @BeforeEach

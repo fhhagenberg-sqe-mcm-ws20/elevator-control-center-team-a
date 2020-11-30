@@ -2,6 +2,7 @@ package at.fhhgb.team.a.elevators.app;
 
 import at.fhhgb.team.a.elevators.model.Elevator;
 import at.fhhgb.team.a.elevators.model.Floor;
+import at.fhhgb.team.a.elevators.model.Position;
 import at.fhhgb.team.a.elevators.view.Colors;
 import at.fhhgb.team.a.elevators.viewmodels.ElevatorFloorViewModel;
 import javafx.scene.paint.Color;
@@ -13,7 +14,7 @@ import org.mockito.Mockito;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("For any ElevatorFloorViewModel instance")
-public class ElevatorFloorViewModelTest {
+class ElevatorFloorViewModelTest {
     Elevator elevator;
     Floor floor;
     ElevatorFloorViewModel viewModel;
@@ -32,13 +33,15 @@ public class ElevatorFloorViewModelTest {
         Mockito.when(elevator.getTarget()).thenReturn(null);
         Mockito.when(elevator.servicesFloor(1)).thenReturn(true);
 
+        viewModel.onTargetFloorChanged();
         var background = viewModel.getButtonBackground();
-        assertThat(background.getValue().getFills().stream().map(b -> (Color)b.getFill()).anyMatch(f -> f == Colors.serviceWhite));
+        assertThat(background.getValue().getFills().stream().map(b -> (Color)b.getFill()).anyMatch(f -> f == Colors.serviceWhite)).isTrue();
 
         Mockito.when(elevator.getTarget()).thenReturn(floor);
 
+        viewModel.onTargetFloorChanged();
         var changedBackground = viewModel.getButtonBackground();
-        assertThat(changedBackground.getValue().getFills().stream().map(b -> (Color)b.getFill()).anyMatch(f -> f == Colors.targetGreen));
+        assertThat(changedBackground.getValue().getFills().stream().map(b -> (Color)b.getFill()).anyMatch(f -> f == Colors.targetGreen)).isTrue();
     }
 
     @Test
@@ -47,13 +50,15 @@ public class ElevatorFloorViewModelTest {
         Mockito.when(elevator.getTarget()).thenReturn(null);
         Mockito.when(elevator.servicesFloor(1)).thenReturn(false);
 
+        viewModel.onTargetFloorChanged();
         var background = viewModel.getButtonBackground();
-        assertThat(background.getValue().getFills().stream().map(b -> (Color)b.getFill()).anyMatch(f -> f == Colors.noServiceGray));
+        assertThat(background.getValue().getFills().stream().map(b -> (Color)b.getFill()).anyMatch(f -> f == Colors.noServiceGray)).isTrue();
 
         Mockito.when(elevator.servicesFloor(1)).thenReturn(true);
-        Mockito.when(elevator.getTarget()).thenReturn(floor);
+        Mockito.when(elevator.getCurrentPosition()).thenReturn(new Position(100, floor));
 
+        viewModel.onTargetFloorChanged();
         var changedBackground = viewModel.getButtonBackground();
-        assertThat(changedBackground.getValue().getFills().stream().map(b -> (Color)b.getFill()).anyMatch(f -> f == Colors.currentYellow));
+        assertThat(changedBackground.getValue().getFills().stream().map(b -> (Color)b.getFill()).anyMatch(f -> f == Colors.currentYellow)).isTrue();
     }
 }

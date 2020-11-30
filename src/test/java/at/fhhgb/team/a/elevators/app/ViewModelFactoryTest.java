@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-public class ViewModelFactoryTest {
+class ViewModelFactoryTest {
     Building building;
     ViewModelFactory viewModelFactory;
 
