@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
+import org.testfx.matcher.control.LabeledMatchers;
 
 import static org.testfx.api.FxAssert.verifyThat;
 import static org.testfx.util.NodeQueryUtils.hasText;
@@ -34,11 +35,11 @@ public class AppTest {
     @Test
     public void testManualModeButton(FxRobot robot) {
         verifyThat("#modeButton", isVisible());
-        verifyThat("#modeButton", hasText("Auto"));
+        verifyThat("#modeButton", LabeledMatchers.hasText("Auto"));
 
         robot.clickOn("#modeButton");
 
         verifyThat("#modeButton", isVisible());
-        //verifyThat("#modeButton", hasText("Manual"));
+        verifyThat("#modeButton", LabeledMatchers.hasText("Manual"));
     }
 }
