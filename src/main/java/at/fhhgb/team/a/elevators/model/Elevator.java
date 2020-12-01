@@ -1,13 +1,11 @@
 package at.fhhgb.team.a.elevators.model;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Represents an elevator used in the system
  */
-public class Elevator {
+public class Elevator extends Observable {
 
     /** The number of the elevator.
      *  Elevator numbering starts at zero for elevator 1. */
@@ -158,6 +156,8 @@ public class Elevator {
      */
     public void setTarget(Floor target) {
         this.target = target;
+        setChanged();
+        notifyObservers();
     }
 
     /**
@@ -191,5 +191,9 @@ public class Elevator {
 
     public void setDoorStatus(DoorStatus doorStatus) {
         this.doorStatus = doorStatus;
+    }
+
+    public List<Floor> getFloors() {
+        return new ArrayList<>(elevatorButtons.keySet());
     }
 }

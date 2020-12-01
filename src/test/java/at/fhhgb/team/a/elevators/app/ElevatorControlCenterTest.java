@@ -14,11 +14,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 
 @DisplayName("For any ElevatorControlCenter instance")
-public class ElevatorControlCenterTest {
+class ElevatorControlCenterTest {
 
     @Nested
     @DisplayName("assert that pollElevatorApi")
-    public class PollElevatorApi {
+    class PollElevatorApi {
 
         IElevator elevatorApi;
         ElevatorControlCenter controlCenter;
