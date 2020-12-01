@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
+import org.testfx.api.FxRobotInterface;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 import org.testfx.matcher.control.LabeledMatchers;
@@ -41,12 +42,13 @@ public class AppTest {
 
     @Test
     public void testManualModeButton(FxRobot robot) {
-        verifyThat("#modeButton", isVisible());
-        verifyThat("#modeButton", LabeledMatchers.hasText("Auto"));
+        verifyThat(robot.lookup("#modeButton").queryAs(Button.class), isVisible());
+        verifyThat(robot.lookup("#modeButton").queryAs(Button.class), LabeledMatchers.hasText("Auto"));
 
-        robot.clickOn("#modeButton");
+        robot.clickOn(robot.lookup("#modeButton").queryAs(Button.class));
+
         WaitForAsyncUtils.waitForFxEvents();
-        verifyThat("#modeButton", isVisible());
-        verifyThat("#modeButton", LabeledMatchers.hasText("Manual"));
+        verifyThat(robot.lookup("#modeButton").queryAs(Button.class), isVisible());
+        verifyThat(robot.lookup("#modeButton").queryAs(Button.class), LabeledMatchers.hasText("Manual"));
     }
 }
