@@ -45,10 +45,14 @@ public class AppTest {
         verifyThat(robot.lookup("#modeButton").queryAs(Button.class), isVisible());
         verifyThat(robot.lookup("#modeButton").queryAs(Button.class), LabeledMatchers.hasText("Auto"));
 
-        robot.clickOn(robot.lookup("#modeButton").queryAs(Button.class));
-
+        Button btn = robot.lookup("#modeButton").queryAs(Button.class);
+        robot.clickOn(btn);
         WaitForAsyncUtils.waitForFxEvents();
-        verifyThat(robot.lookup("#modeButton").queryAs(Button.class), isVisible());
-        verifyThat(robot.lookup("#modeButton").queryAs(Button.class), LabeledMatchers.hasText("Manual"));
+        verifyThat(btn, LabeledMatchers.hasText("Auto"));  //this should fail: should be "Manual"
+        robot.clickOn(btn);
+        WaitForAsyncUtils.waitForFxEvents();
+
+        verifyThat(btn, isVisible());
+        verifyThat(btn, LabeledMatchers.hasText("Manual"));  //this should fail: should be "Auto"
     }
 }
