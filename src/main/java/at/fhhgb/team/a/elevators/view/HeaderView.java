@@ -29,8 +29,8 @@ public class HeaderView extends BorderPane {
         Label heading = new Label(HEADING);
         heading.setFont(Font.font("Arial", FontWeight.BOLD, 25));
 
-        this.setLeft(heading);
-        this.setRight(modeButton);
+        this.setTop(heading);
+        this.setBottom(modeButton);
     }
 
     private void onMouseClickEvent(MouseEvent event) {
