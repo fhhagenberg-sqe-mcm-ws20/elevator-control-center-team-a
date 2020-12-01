@@ -46,12 +46,8 @@ public class AppTest {
         verifyThat(robot.lookup("#modeButton").queryAs(Button.class), LabeledMatchers.hasText("Auto"));
 
         Button btn = robot.lookup("#modeButton").queryAs(Button.class);
-        btn.fire();
-//        robot.clickOn(btn);
-//        WaitForAsyncUtils.waitForFxEvents();
-//        verifyThat(btn, LabeledMatchers.hasText("Auto"));  //this should fail: should be "Manual"
-//        robot.clickOn(btn);
-//        WaitForAsyncUtils.waitForFxEvents();
+        robot.clickOn(btn);
+        WaitForAsyncUtils.waitForFxEvents();
 
         verifyThat(btn, isVisible());
         verifyThat(btn, LabeledMatchers.hasText("Manual"));  //this should fail: should be "Auto"

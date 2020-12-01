@@ -34,7 +34,10 @@ public class HeaderView extends BorderPane {
     }
 
     private void onMouseClickEvent(MouseEvent event) {
+        System.out.println("Button pressed: " + ((Button) event.getSource()).getText() + " == " + modeViewModel.getButtonText());
         modeViewModel.onButtonPressed();
+        System.out.println("Button Text is now: " + modeViewModel.getButtonText());
+
         ((Button) event.getSource()).setText(modeViewModel.getButtonText());
     }
 }
