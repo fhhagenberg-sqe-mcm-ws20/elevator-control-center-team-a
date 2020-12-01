@@ -1,6 +1,5 @@
 package at.fhhgb.team.a.elevators.app;
 
-import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +13,6 @@ import static org.testfx.util.NodeQueryUtils.isVisible;
 
 @ExtendWith(ApplicationExtension.class)
 public class AppTest {
-    private Button button;
 
     /**
      * Will be called with {@code @Before} semantics, i. e. before each test method.
@@ -39,6 +37,6 @@ public class AppTest {
         robot.clickOn("#modeButton");
 
         verifyThat("#modeButton", isVisible());
-        //verifyThat("#modeButton", hasText("Manual"));
+        verifyThat("#modeButton", hasText("Manual"));
     }
 }
