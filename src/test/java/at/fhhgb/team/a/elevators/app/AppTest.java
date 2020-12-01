@@ -2,6 +2,7 @@ package at.fhhgb.team.a.elevators.app;
 
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
@@ -27,6 +28,11 @@ public class AppTest {
     public void start(Stage stage) {
         var app = new App();
         app.start(stage);
+    }
+
+    @BeforeAll
+    public static void config() throws Exception {
+        System.getProperties().put("testfx.robot", "glass");
     }
 
     /**
