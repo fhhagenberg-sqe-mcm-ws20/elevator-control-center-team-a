@@ -8,6 +8,7 @@ import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 import org.testfx.matcher.control.LabeledMatchers;
+import org.testfx.util.WaitForAsyncUtils;
 
 import static org.testfx.api.FxAssert.verifyThat;
 import static org.testfx.util.NodeQueryUtils.hasText;
@@ -38,7 +39,7 @@ public class AppTest {
         verifyThat("#modeButton", LabeledMatchers.hasText("Auto"));
 
         robot.clickOn("#modeButton");
-
+        WaitForAsyncUtils.waitForFxEvents();
         verifyThat("#modeButton", isVisible());
         verifyThat("#modeButton", LabeledMatchers.hasText("Manual"));
     }
