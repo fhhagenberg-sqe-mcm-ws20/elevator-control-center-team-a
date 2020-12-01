@@ -61,6 +61,10 @@ public class Building {
                 .orElse(null);
     }
 
+    public List<Elevator> getElevators() {
+        return elevators;
+    }
+
     /**
      * Retrieves the floor with the specific number.
      * @param floorNumber the number of the floor which is searched
@@ -72,5 +76,9 @@ public class Building {
                 .filter(f -> f.getNumber() == floorNumber)
                 .findFirst()
                 .orElse(null);
+    }
+
+    public List<Floor> getFloors() {
+        return floors;
     }
 }
