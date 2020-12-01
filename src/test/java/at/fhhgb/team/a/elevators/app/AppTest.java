@@ -1,6 +1,5 @@
 package at.fhhgb.team.a.elevators.app;
 
-import at.fhhgb.team.a.elevators.app.App;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.Test;

@@ -14,6 +14,8 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
+import java.util.Observable;
+
 public class ElevatorFloorViewModel {
 
     private final Floor floor;
@@ -31,6 +33,8 @@ public class ElevatorFloorViewModel {
     public ElevatorFloorViewModel(Elevator elevator, Floor floor) {
         this.floor = floor;
         this.elevator = elevator;
+
+        this.elevator.addObserver(this::update);
 
         CornerRadii cornerRadii = new CornerRadii(4);
         serviceBackgroundFill = new BackgroundFill(Colors.serviceWhite, cornerRadii, Insets.EMPTY);
@@ -84,5 +88,9 @@ public class ElevatorFloorViewModel {
             backgroundFill = elevator.getCurrentPosition().getClosestFloor() == floor ? currentBackgroundFill : backgroundFill;
         }
         return new Background(backgroundFill);
+    }
+
+    private void update(Observable o, Object arg) {
+        onTargetFloorChanged();
     }
 }
