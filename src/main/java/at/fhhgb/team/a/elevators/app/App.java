@@ -29,23 +29,11 @@ import java.util.List;
 public class App extends Application {
 
     @Override
-    public void start(Stage stage) {
-        IElevator elevatorApi = null;
-        try {
-            elevatorApi = (IElevator) Naming.lookup("rmi://localhost/ElevatorSim");
-        } catch (NotBoundException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+    public void start(Stage stage) throws RemoteException, NotBoundException, MalformedURLException {
+        IElevator elevatorApi = (IElevator) Naming.lookup("rmi://localhost/ElevatorSim");
+
         ElevatorControlCenter controlCenter = new ElevatorControlCenter(elevatorApi);
-        try {
-            controlCenter.pollElevatorApi();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        controlCenter.startPolling();
 
         Building building = controlCenter.getBuilding();
         ViewModelFactory viewModelFactory = new ViewModelFactory(building);

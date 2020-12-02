@@ -7,6 +7,9 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ElevatorControlCenter {
 
@@ -27,6 +30,21 @@ public class ElevatorControlCenter {
 
     public ElevatorControlCenter(IElevator elevatorApi) {
         this.elevatorApi = elevatorApi;
+    }
+
+    public void startPolling() throws RemoteException {
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+
+        Runnable runnable = () -> {
+            try {
+                pollElevatorApi();
+            } catch (RemoteException e) {
+                Thread thread = Thread.currentThread();
+                thread.getUncaughtExceptionHandler().uncaughtException(thread, e);
+            }
+        };
+
+        executorService.scheduleAtFixedRate(runnable, 0, 10, TimeUnit.SECONDS);
     }
 
     public void pollElevatorApi() throws RemoteException {

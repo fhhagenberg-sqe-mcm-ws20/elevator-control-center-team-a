@@ -7,6 +7,10 @@ import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
+import java.net.MalformedURLException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+
 import static org.testfx.api.FxAssert.verifyThat;
 import static org.testfx.util.NodeQueryUtils.hasText;
 import static org.testfx.util.NodeQueryUtils.isVisible;
@@ -20,7 +24,7 @@ public class AppTest {
      * @param stage - Will be injected by the test runner.
      */
     @Start
-    public void start(Stage stage) {
+    public void start(Stage stage) throws RemoteException, NotBoundException, MalformedURLException {
         var app = new App();
         app.start(stage);
     }
