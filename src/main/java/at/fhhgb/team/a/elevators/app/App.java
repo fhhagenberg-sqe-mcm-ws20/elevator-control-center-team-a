@@ -13,7 +13,9 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import sqelevator.IElevator;
 
+import java.rmi.Naming;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -107,7 +109,9 @@ public class App extends Application {
         return elevatorViews;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        IElevator elevatorApi = (IElevator) Naming.lookup("rmi://localhost/ElevatorSim");
+        ElevatorControlCenter controlCenter = new ElevatorControlCenter(elevatorApi);
         launch();
     }
 
