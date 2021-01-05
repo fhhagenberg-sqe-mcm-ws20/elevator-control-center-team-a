@@ -77,7 +77,7 @@ public class AppTest {
     }
 
     @Test
-    public void testElevatorFloorButtonClick(FxRobot robot) {
+    public void testElevatorFloorButtonClick(FxRobot robot) throws RemoteException {
         Elevator elevator = controlCenter.getBuilding().getElevator(0);
         
         // Assert that the default target number is set
@@ -100,6 +100,9 @@ public class AppTest {
         robot.clickOn("#e0-f2");
 
         // Assert that the API call has been executed
+        controlCenter.pollElevatorApi();
+        elevator = controlCenter.getBuilding().getElevator(0);
+
         Floor target = elevator.getTarget();
         assertThat(target.getNumber()).isEqualTo(2);
     }
