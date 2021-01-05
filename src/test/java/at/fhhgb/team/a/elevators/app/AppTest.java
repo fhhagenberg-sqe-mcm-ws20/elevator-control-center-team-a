@@ -105,33 +105,18 @@ public class AppTest {
     }
 
     @Test
-    public void testFloorButtonWasClicked() {
-        Floor floor = controlCenter.getBuilding().getFloor(1);
-
+    public void testElevatorSpeedChange(FxRobot robot) throws RemoteException {
         // Assert that the GUI shows the default values
-        verifyThat("#f1-up", isVisible());
-        verifyThat("#f1-up", hasText("2"));
+        verifyThat("#e0-speed", isVisible());
+        verifyThat("#e0-speed", hasText("speed: 10.0 km/h"));
 
-        /*
-        StackPane stackButtonUp = lookup("#f1-up").queryAll().iterator().next();
-        Paint color = stackButtonUp.getBackground().getFills().get(0).getFill();
-        assertThat(color.isEqualTo(Color.rgb(123, 206, 123)));
-
-         */
-
+        // Get updates
+        Mockito.when(elevatorApi.getClockTick()).thenReturn(2L);
+        Mockito.when(elevatorApi.getElevatorSpeed(0)).thenReturn(12);
+        controlCenter.pollElevatorApi();
 
         // Assert that the GUI shows the updated values
-        verifyThat("#f1-up", isVisible());
-        verifyThat("#f1-up", hasText("2"));
-    }
-
-    @Test
-    public void testElevatorWeightChange() {
-        Elevator elevator = controlCenter.getBuilding().getElevator(0);
-
-        // Assert that the default weight is set
-        verifyThat("#e0-weight", isVisible());
-        verifyThat("#e0-weight", hasText("weight: 500.0 kg"));
-
+        verifyThat("#e0-speed", isVisible());
+        verifyThat("#e0-speed", hasText("speed: 12.0 km/h"));
     }
 }

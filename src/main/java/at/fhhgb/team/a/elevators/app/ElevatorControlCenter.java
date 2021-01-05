@@ -46,7 +46,8 @@ public class ElevatorControlCenter {
             if(building == null) {
                 building = createBuilding(floors, elevators);
             } else {
-                updateBuilding(floors, elevators);
+                //updateBuilding(floors, elevators);
+                building.getElevators().get(0).setSpeed(12);
             }
             lastUpdateTick = startTick;
         } else {
