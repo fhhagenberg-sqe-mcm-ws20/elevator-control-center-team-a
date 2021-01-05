@@ -1,7 +1,8 @@
 package at.fhhgb.team.a.elevators.app;
 
-import at.fhhgb.team.a.elevators.model.Building;
+import at.fhhgb.team.a.elevators.model.*;
 import javafx.stage.Stage;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -14,6 +15,8 @@ import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.testfx.api.FxAssert.verifyThat;
 import static org.testfx.util.NodeQueryUtils.hasText;
 import static org.testfx.util.NodeQueryUtils.isVisible;
@@ -33,9 +36,24 @@ public class AppTest {
         elevatorApi = Mockito.mock(IElevator.class);
         controlCenter = new ElevatorControlCenter(elevatorApi);
 
+        setupMockup();
+
         var app = new App();
         app.setControlCenter(controlCenter);
         app.start(stage);
+    }
+
+    private void setupMockup() throws RemoteException {
+        Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
+        Mockito.when(elevatorApi.getFloorNum()).thenReturn(4);
+        Mockito.when(elevatorApi.getElevatorNum()).thenReturn(2);
+        Mockito.when(elevatorApi.getCommittedDirection(anyInt())).thenReturn(Direction.down.number);
+        Mockito.when(elevatorApi.getElevatorAccel(anyInt())).thenReturn(50);
+        Mockito.when(elevatorApi.getElevatorCapacity(anyInt())).thenReturn(100);
+        Mockito.when(elevatorApi.getElevatorDoorStatus(anyInt())).thenReturn(DoorStatus.closing.number);
+        Mockito.when(elevatorApi.getElevatorSpeed(anyInt())).thenReturn(10);
+        Mockito.when(elevatorApi.getElevatorWeight(anyInt())).thenReturn(500);
+        Mockito.when(elevatorApi.getServicesFloors(anyInt(), anyInt())).thenReturn(true);
     }
 
     /**
@@ -54,7 +72,14 @@ public class AppTest {
     }
 
     @Test
-    public void testElevatorFloorButtonClicked(FxRobot robot) {
+    public void testElevatorFloorButtonClick(FxRobot robot) {
+        Elevator elevator = controlCenter.getBuilding().getElevator(0);
+        
+        // Assert that the default target number is set
+        Floor defaultTarget = elevator.getTarget();
+        assertThat(defaultTarget.getNumber()).isEqualTo(0);
+
+        // Go into manual mode
         verifyThat("#modeButton", isVisible());
         verifyThat("#modeButton", hasText("Auto"));
 
@@ -62,5 +87,15 @@ public class AppTest {
 
         verifyThat("#modeButton", isVisible());
         verifyThat("#modeButton", hasText("Manual"));
+
+        // Click on elevator floor button
+        verifyThat("#e0-f2", isVisible());
+        verifyThat("#e0-f2", hasText("2"));
+
+        robot.clickOn("#e0-f2");
+
+        // Assert that the API call has been executed
+        Floor target = elevator.getTarget();
+        assertThat(target.getNumber()).isEqualTo(2);
     }
 }

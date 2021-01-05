@@ -41,7 +41,7 @@ public class ElevatorView extends HBox {
         elevatorFloorViewModelList.sort(Comparator.comparing(ElevatorFloorViewModel::getNumber).reversed());
         for (ElevatorFloorViewModel floorViewModel : elevatorFloorViewModelList) {
             var floorButton = new Button();
-            floorButton.idProperty().bind(floorViewModel.getTitle());
+            floorButton.idProperty().bind(floorViewModel.getId());
             floorButton.textProperty().bind(floorViewModel.getTitle());
             floorButton.textFillProperty().bind(floorViewModel.getTitleFill());
             floorButton.backgroundProperty().bind(floorViewModel.getButtonBackground());
