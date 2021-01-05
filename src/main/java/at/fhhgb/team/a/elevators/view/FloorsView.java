@@ -41,6 +41,8 @@ public class FloorsView extends VBox {
             var stackButtonUp = new StackPane(upButtonImageView);
             stackButtonUp.setPadding(new Insets(4));
             stackButtonUp.backgroundProperty().bind(floorViewModel.getUpButtonBackground());
+            FloorUpButtonClickEvent eventUp = new FloorUpButtonClickEvent(floorViewModel);
+            stackButtonUp.setOnMouseClicked(eventUp::onClicked);
             hbox.getChildren().add(stackButtonUp);
 
             var downButtonImageView = new ImageView("images/down-chevron.png");
@@ -50,6 +52,8 @@ public class FloorsView extends VBox {
             var stackButtonDown = new StackPane(downButtonImageView);
             stackButtonDown.setPadding(new Insets(4));
             stackButtonDown.backgroundProperty().bind(floorViewModel.getDownButtonBackground());
+            FloorDownButtonClickEvent eventDown = new FloorDownButtonClickEvent(floorViewModel);
+            stackButtonDown.setOnMouseClicked(eventDown::onClicked);
             hbox.getChildren().add(stackButtonDown);
 
             hbox.setSpacing(8);
