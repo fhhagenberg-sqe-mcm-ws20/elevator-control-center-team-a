@@ -1,4 +1,4 @@
-package at.fhhgb.team.a.elevators.app;
+package at.fhhgb.team.a.elevators.factory;
 
 import at.fhhgb.team.a.elevators.factory.ViewModelFactory;
 import at.fhhgb.team.a.elevators.model.Building;
