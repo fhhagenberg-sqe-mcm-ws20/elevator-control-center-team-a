@@ -22,4 +22,4 @@ jobs:
       with:
         java-version: 13
     - name: Build with Maven
-      run: xvfb-run --server-args="-screen 0, 640x660" mvn -B verify --file pom.xml javadoc:javadoc
+      run: xvfb-run --server-args="-screen 0, 640x660x8" mvn -B verify --file pom.xml javadoc:javadoc
