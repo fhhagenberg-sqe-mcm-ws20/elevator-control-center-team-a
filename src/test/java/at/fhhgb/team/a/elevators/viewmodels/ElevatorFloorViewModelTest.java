@@ -1,4 +1,4 @@
-package at.fhhgb.team.a.elevators.app;
+package at.fhhgb.team.a.elevators.viewmodels;
 
 import at.fhhgb.team.a.elevators.model.Elevator;
 import at.fhhgb.team.a.elevators.model.Floor;

@@ -26,6 +26,7 @@ public class ElevatorFloorViewModel {
     private final BackgroundFill targetBackgroundFill;
     private final BackgroundFill currentBackgroundFill;
 
+    private final StringProperty id;
     private final StringProperty title;
     private final ObjectProperty<Paint> titleFill;
     private final ObjectProperty<Background> buttonBackground;
@@ -41,6 +42,9 @@ public class ElevatorFloorViewModel {
         noServiceBackgroundFill = new BackgroundFill(Colors.noServiceGray, cornerRadii, Insets.EMPTY);
         targetBackgroundFill = new BackgroundFill(Colors.targetGreen, cornerRadii, Insets.EMPTY);
         currentBackgroundFill = new BackgroundFill(Colors.currentYellow, cornerRadii, Insets.EMPTY);
+
+        String idString = "e" + elevator.getNumber() + "-f" + floor.getNumber();
+        id = new SimpleStringProperty(idString);
 
         String titleString = String.valueOf(floor.getNumber());
         title = new SimpleStringProperty(titleString);
@@ -63,6 +67,10 @@ public class ElevatorFloorViewModel {
 
     public int getNumber() {
         return floor.getNumber();
+    }
+
+    public StringProperty getId() {
+        return id;
     }
 
     public StringProperty getTitle() {

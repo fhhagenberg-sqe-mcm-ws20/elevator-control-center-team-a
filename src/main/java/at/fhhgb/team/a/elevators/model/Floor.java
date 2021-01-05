@@ -1,6 +1,9 @@
 package at.fhhgb.team.a.elevators.model;
 
-public class Floor {
+
+import java.util.Observable;
+
+public class Floor extends Observable {
 
     /** The number of the floor.
      *  Floor numbering starts at 0 for floor 1. */
