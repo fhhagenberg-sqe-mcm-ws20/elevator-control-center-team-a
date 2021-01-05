@@ -32,7 +32,7 @@ public class App extends Application {
         controlCenter = new ElevatorControlCenter(elevatorApi);
     }
 
-    public void setControlCenter(ElevatorControlCenter controlCenter) {
+    public App(ElevatorControlCenter controlCenter) {
         this.controlCenter = controlCenter;
     }
 

@@ -43,8 +43,7 @@ public class AppTest {
 
         setupMockup();
 
-        var app = new App();
-        app.setControlCenter(controlCenter);
+        var app = new App(controlCenter);
         app.start(stage);
     }
 
