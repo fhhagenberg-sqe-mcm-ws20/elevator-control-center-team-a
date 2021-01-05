@@ -102,7 +102,9 @@ public class ElevatorControlCenter {
                 building.setElevators(elevators);
             }
 
-            updateElevator(floors, elevator.getNumber());
+            if (elevator != null) {
+                updateElevator(floors, elevator.getNumber());
+            }
         }
     }
 
