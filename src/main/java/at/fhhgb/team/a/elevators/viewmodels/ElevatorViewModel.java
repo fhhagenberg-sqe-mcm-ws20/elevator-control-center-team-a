@@ -13,6 +13,7 @@ public class ElevatorViewModel {
     private final Elevator elevator;
     private final ECCMode eccMode;
 
+    private final StringProperty id;
     private final StringProperty title;
     private final ObjectProperty<Image> direction;
     private final StringProperty speed;
@@ -23,6 +24,9 @@ public class ElevatorViewModel {
     public ElevatorViewModel(Elevator elevator, ECCMode eccMode) {
         this.elevator = elevator;
         this.eccMode = eccMode;
+
+        String idString = "e" + elevator.getNumber();
+        id = new SimpleStringProperty(idString);
 
         String titleString = "Elevator " + elevator.getNumber();
         title = new SimpleStringProperty(titleString);
@@ -66,6 +70,10 @@ public class ElevatorViewModel {
             elevator.setTarget(pressedFloorVM.getFloor());
             pressedFloorVM.onTargetFloorChanged();
         }
+    }
+
+    public StringProperty getId() {
+        return id;
     }
 
     public StringProperty getTitle() {

@@ -1,7 +1,5 @@
 package at.fhhgb.team.a.elevators.view;
 
-import at.fhhgb.team.a.elevators.viewmodels.ElevatorFloorViewModel;
-import at.fhhgb.team.a.elevators.viewmodels.ElevatorViewModel;
 import at.fhhgb.team.a.elevators.viewmodels.FloorViewModel;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -40,6 +38,7 @@ public class FloorsView extends VBox {
 
             var stackButtonUp = new StackPane(upButtonImageView);
             stackButtonUp.setPadding(new Insets(4));
+            stackButtonUp.idProperty().bind(floorViewModel.getUpButtonId());
             stackButtonUp.backgroundProperty().bind(floorViewModel.getUpButtonBackground());
             FloorUpButtonClickEvent eventUp = new FloorUpButtonClickEvent(floorViewModel);
             stackButtonUp.setOnMouseClicked(eventUp::onClicked);
@@ -51,6 +50,7 @@ public class FloorsView extends VBox {
 
             var stackButtonDown = new StackPane(downButtonImageView);
             stackButtonDown.setPadding(new Insets(4));
+            stackButtonDown.idProperty().bind(floorViewModel.getDownButtonId());
             stackButtonDown.backgroundProperty().bind(floorViewModel.getDownButtonBackground());
             FloorDownButtonClickEvent eventDown = new FloorDownButtonClickEvent(floorViewModel);
             stackButtonDown.setOnMouseClicked(eventDown::onClicked);

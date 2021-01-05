@@ -1,6 +1,9 @@
 package at.fhhgb.team.a.elevators.app;
 
 import at.fhhgb.team.a.elevators.model.*;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,8 +12,10 @@ import org.mockito.Mockito;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
+import org.testfx.service.query.NodeQuery;
 import sqelevator.IElevator;
 
+import java.awt.*;
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -97,5 +102,36 @@ public class AppTest {
         // Assert that the API call has been executed
         Floor target = elevator.getTarget();
         assertThat(target.getNumber()).isEqualTo(2);
+    }
+
+    @Test
+    public void testFloorButtonWasClicked() {
+        Floor floor = controlCenter.getBuilding().getFloor(1);
+
+        // Assert that the GUI shows the default values
+        verifyThat("#f1-up", isVisible());
+        verifyThat("#f1-up", hasText("2"));
+
+        /*
+        StackPane stackButtonUp = lookup("#f1-up").queryAll().iterator().next();
+        Paint color = stackButtonUp.getBackground().getFills().get(0).getFill();
+        assertThat(color.isEqualTo(Color.rgb(123, 206, 123)));
+
+         */
+
+
+        // Assert that the GUI shows the updated values
+        verifyThat("#f1-up", isVisible());
+        verifyThat("#f1-up", hasText("2"));
+    }
+
+    @Test
+    public void testElevatorWeightChange() {
+        Elevator elevator = controlCenter.getBuilding().getElevator(0);
+
+        // Assert that the default weight is set
+        verifyThat("#e0-weight", isVisible());
+        verifyThat("#e0-weight", hasText("weight: 500.0 kg"));
+
     }
 }

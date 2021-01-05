@@ -1,7 +1,6 @@
 package at.fhhgb.team.a.elevators.viewmodels;
 
 import at.fhhgb.team.a.elevators.model.ECCMode;
-import at.fhhgb.team.a.elevators.model.Elevator;
 import at.fhhgb.team.a.elevators.model.Floor;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -23,15 +22,23 @@ public class FloorViewModel {
     private final BackgroundFill pressedBackgroundFill;
     private final BackgroundFill notPressedBackgroundFill;
 
+    private final StringProperty downButtonId;
+    private final StringProperty upButtonId;
     private StringProperty title;
-    private ObjectProperty<Background> upButtonBackground;
     private ObjectProperty<Background> downButtonBackground;
+    private ObjectProperty<Background> upButtonBackground;
 
     public FloorViewModel(Floor floor, ECCMode eccMode) {
         this.floor = floor;
         this.eccMode = eccMode;
 
         this.floor.addObserver(this::update);
+
+        String downButtonIdString = "f" + floor.getNumber() + "-down";
+        downButtonId = new SimpleStringProperty(downButtonIdString);
+
+        String upButtonIdString = "f" + floor.getNumber() + "-up";
+        upButtonId = new SimpleStringProperty(upButtonIdString);
 
         String titleString = "Floor " + floor.getNumber();
         title = new SimpleStringProperty(titleString);
@@ -71,6 +78,14 @@ public class FloorViewModel {
 
     public int getNumber() {
         return floor.getNumber();
+    }
+
+    public StringProperty getDownButtonId() {
+        return downButtonId;
+    }
+
+    public StringProperty getUpButtonId() {
+        return upButtonId;
     }
 
     public StringProperty getTitle() {
