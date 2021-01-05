@@ -1,8 +1,12 @@
 package at.fhhgb.team.a.elevators.view;
 
+import at.fhhgb.team.a.elevators.viewmodels.ElevatorFloorViewModel;
+import at.fhhgb.team.a.elevators.viewmodels.ElevatorViewModel;
 import at.fhhgb.team.a.elevators.viewmodels.FloorViewModel;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -54,5 +58,29 @@ public class FloorsView extends VBox {
 
             this.getChildren().add(hbox);
         }
+    }
+}
+
+class FloorDownButtonClickEvent extends ActionEvent {
+    private final FloorViewModel floorViewModel;
+
+    public FloorDownButtonClickEvent(FloorViewModel floorViewModel) {
+        this.floorViewModel = floorViewModel;
+    }
+
+    public void onClicked(MouseEvent event) {
+        floorViewModel.onFloorDownButtonPressed();
+    }
+}
+
+class FloorUpButtonClickEvent extends ActionEvent {
+    private final FloorViewModel floorViewModel;
+
+    public FloorUpButtonClickEvent(FloorViewModel floorViewModel) {
+        this.floorViewModel = floorViewModel;
+    }
+
+    public void onClicked(MouseEvent event) {
+        floorViewModel.onFloorUpButtonPressed();
     }
 }
