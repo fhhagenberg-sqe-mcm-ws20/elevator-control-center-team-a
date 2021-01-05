@@ -8,11 +8,15 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
 
-public class ElevatorViewModel {
+import java.util.Observable;
+import java.util.Observer;
+
+public class ElevatorViewModel implements Observer {
 
     private final Elevator elevator;
     private final ECCMode eccMode;
 
+    private final StringProperty id;
     private final StringProperty title;
     private final ObjectProperty<Image> direction;
     private final StringProperty speed;
@@ -24,27 +28,15 @@ public class ElevatorViewModel {
         this.elevator = elevator;
         this.eccMode = eccMode;
 
+        this.elevator.addObserver(this);
+
+        String idString = "e" + elevator.getNumber();
+        id = new SimpleStringProperty(idString);
+
         String titleString = "Elevator " + elevator.getNumber();
         title = new SimpleStringProperty(titleString);
 
-        Image image = null;
-        try {
-            image = new Image("images/up-arrow.png");
-
-            switch (elevator.getCommittedDirection()) {
-                case up:
-                    image = new Image("images/up-arrow.png");
-                    break;
-                case down:
-                    image = new Image("images/down-arrow.png");
-                    break;
-                case uncommitted:
-                    image = new Image("images/right-arrow.png");
-                    break;
-            }
-        } catch (RuntimeException e) {
-            System.out.println("Cannot load image - JavaFX not initialized");
-        }
+        Image image = loadDirectionImage();
 
         direction = new SimpleObjectProperty<>(image);
 
@@ -66,6 +58,10 @@ public class ElevatorViewModel {
             elevator.setTarget(pressedFloorVM.getFloor());
             pressedFloorVM.onTargetFloorChanged();
         }
+    }
+
+    public StringProperty getId() {
+        return id;
     }
 
     public StringProperty getTitle() {
@@ -97,5 +93,47 @@ public class ElevatorViewModel {
 
     public int getElevatorNumber() {
         return elevator.getNumber();
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        String idString = "e" + elevator.getNumber();
+        id.setValue(idString);
+
+        String titleString = "Elevator " + elevator.getNumber();
+        title.setValue(titleString);
+
+        Image image = loadDirectionImage();
+
+        direction.setValue(image);
+
+        String speedString = "speed: " + elevator.getSpeed() + " km/h";
+        speed.setValue(speedString);
+
+        String capacityString = "max. capacity: " + elevator.getCapacity() + " people";
+        capacity.setValue(capacityString);
+
+        String weightString = "weight: " + elevator.getWeight() + " kg";
+        weight.setValue(weightString);
+
+        String doorStatusString = "doors: " + elevator.getDoorStatus();
+        doorStatus.setValue(doorStatusString);
+    }
+
+    private Image loadDirectionImage() {
+        try {
+            switch (elevator.getCommittedDirection()) {
+                case up:
+                    return new Image("images/up-arrow.png");
+                case down:
+                    return new Image("images/down-arrow.png");
+                case uncommitted:
+                    return new Image("images/right-arrow.png");
+            }
+        } catch (RuntimeException e) {
+            System.out.println("Cannot load image - JavaFX not initialized");
+        }
+
+        return null;
     }
 }

@@ -40,7 +40,7 @@ public class ViewModelFactory {
 
     public List<FloorViewModel> createAllFloorViewModels() {
         List<FloorViewModel> list = new ArrayList<>();
-        building.getFloors().forEach(floor -> list.add(new FloorViewModel(floor)));
+        building.getFloors().forEach(floor -> list.add(new FloorViewModel(floor, eccMode)));
         return list;
     }
 

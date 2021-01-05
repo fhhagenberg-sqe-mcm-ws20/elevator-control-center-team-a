@@ -166,6 +166,8 @@ public class Elevator extends Observable {
      */
     public void setCommittedDirection(Direction committedDirection) {
         this.committedDirection = committedDirection;
+        setChanged();
+        notifyObservers();
     }
 
     /**
@@ -175,22 +177,32 @@ public class Elevator extends Observable {
      */
     public void addFloorService(Floor floor, boolean pressed) {
         elevatorButtons.put(floor, pressed);
+        setChanged();
+        notifyObservers();
     }
 
     public void setSpeed(float speed) {
         this.speed = speed;
+        setChanged();
+        notifyObservers();
     }
 
     public void setAcceleration(float acceleration) {
         this.acceleration = acceleration;
+        setChanged();
+        notifyObservers();
     }
 
     public void setCurrentPosition(Position currentPosition) {
         this.currentPosition = currentPosition;
+        setChanged();
+        notifyObservers();
     }
 
     public void setDoorStatus(DoorStatus doorStatus) {
         this.doorStatus = doorStatus;
+        setChanged();
+        notifyObservers();
     }
 
     public List<Floor> getFloors() {

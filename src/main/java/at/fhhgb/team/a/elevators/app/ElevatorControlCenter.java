@@ -46,7 +46,8 @@ public class ElevatorControlCenter {
             if(building == null) {
                 building = createBuilding(floors, elevators);
             } else {
-                updateBuilding(floors, elevators);
+                updateFloors();
+                updateElevators(building.getFloors());
             }
             lastUpdateTick = startTick;
         } else {
@@ -55,9 +56,83 @@ public class ElevatorControlCenter {
         }
     }
 
-    public void updateBuilding(List<Floor> floors, List<Elevator> elevators) {
-        building.setFloors(floors);
-        building.setElevators(elevators);
+    public void updateFloors() throws RemoteException {
+        int floorNum = elevatorApi.getFloorNum();
+        for(int i = 0; i < floorNum; i ++) {
+            boolean buttonDown = elevatorApi.getFloorButtonDown(i);
+            boolean buttonUp = elevatorApi.getFloorButtonUp(i);
+
+            Floor floor = building.getFloor(i);
+
+            if (floor == null) {
+                floor = new Floor(i);
+
+                List<Floor> floors = building.getFloors();
+                floors.add(floor);
+
+                building.setFloors(floors);
+            }
+
+            if(buttonDown) {
+                floor.pressDownButton();
+            }
+
+            if(buttonUp) {
+                floor.pressUpButton();
+            }
+        }
+    }
+
+    public void updateElevators(List<Floor> floors) throws RemoteException {
+        for (Elevator elevator: building.getElevators()) {
+            updateElevator(floors, elevator.getNumber());
+        }
+
+        int elevatorNum = elevatorApi.getElevatorNum();
+        for(int i = 0; i < elevatorNum; i ++) {
+
+            Elevator elevator = building.getElevator(i);
+
+            if (elevator == null) {
+                elevator = createElevator(floors, i);
+
+                List<Elevator> elevators = building.getElevators();
+                elevators.add(elevator);
+
+                building.setElevators(elevators);
+            }
+
+            if (elevator != null) {
+                updateElevator(floors, elevator.getNumber());
+            }
+        }
+    }
+
+    public void updateElevator(List<Floor> floors, int elevatorNumber) throws RemoteException {
+        int target = elevatorApi.getTarget(elevatorNumber);
+        int elevatorFloor = elevatorApi.getElevatorFloor(elevatorNumber);
+        Optional<Floor> targetFloor = floors.stream().filter(f -> f.getNumber() == target).findFirst();
+        Optional<Floor> closestFloor = floors.stream().filter(f -> f.getNumber() == elevatorFloor).findFirst();
+
+        if(!targetFloor.isPresent() || !closestFloor.isPresent()) {
+            // no floors found - skip this elevator
+            return;
+        }
+
+        int committedDirection = elevatorApi.getCommittedDirection(elevatorNumber);
+        int elevatorAccel = elevatorApi.getElevatorAccel(elevatorNumber);
+        int elevatorDoorStatus = elevatorApi.getElevatorDoorStatus(elevatorNumber);
+        int elevatorPosition = elevatorApi.getElevatorPosition(elevatorNumber);
+        int elevatorSpeed = elevatorApi.getElevatorSpeed(elevatorNumber);
+        Position currentPosition = new Position(elevatorPosition, closestFloor.get());
+
+        Elevator elevator = building.getElevator(elevatorNumber);
+        elevator.setCommittedDirection(Direction.fromNumber(committedDirection));
+        elevator.setSpeed(elevatorSpeed);
+        elevator.setAcceleration(elevatorAccel);
+        elevator.setDoorStatus(DoorStatus.fromNumber(elevatorDoorStatus));
+        elevator.setTarget(targetFloor.get());
+        elevator.setCurrentPosition(currentPosition);
     }
 
     public Building getBuilding() {
