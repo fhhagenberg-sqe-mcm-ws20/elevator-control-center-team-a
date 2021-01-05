@@ -37,13 +37,13 @@ public class ElevatorControlCenter {
             return;
         }
 
+        List<Floor> floors = createFloors();
+        List<Elevator> elevators = createElevators(floors);
+        addFloorServiceAssignments(elevators, floors);
         long endTick = elevatorApi.getClockTick();
 
         if(startTick == endTick) {
             if(building == null) {
-                List<Floor> floors = createFloors();
-                List<Elevator> elevators = createElevators(floors);
-                addFloorServiceAssignments(elevators, floors);
                 building = createBuilding(floors, elevators);
             } else {
                 updateFloors();
@@ -57,9 +57,21 @@ public class ElevatorControlCenter {
     }
 
     public void updateFloors() throws RemoteException {
-        for (Floor floor: building.getFloors()) {
-            boolean buttonDown = elevatorApi.getFloorButtonDown(floor.getNumber());
-            boolean buttonUp = elevatorApi.getFloorButtonUp(floor.getNumber());
+        int floorNum = elevatorApi.getFloorNum();
+        for(int i = 0; i < floorNum; i ++) {
+            boolean buttonDown = elevatorApi.getFloorButtonDown(i);
+            boolean buttonUp = elevatorApi.getFloorButtonUp(i);
+
+            Floor floor = building.getFloor(i);
+
+            if (floor == null) {
+                floor = new Floor(i);
+
+                List<Floor> floors = building.getFloors();
+                floors.add(floor);
+
+                building.setFloors(floors);
+            }
 
             if(buttonDown) {
                 floor.pressDownButton();
@@ -73,6 +85,23 @@ public class ElevatorControlCenter {
 
     public void updateElevators(List<Floor> floors) throws RemoteException {
         for (Elevator elevator: building.getElevators()) {
+            updateElevator(floors, elevator.getNumber());
+        }
+
+        int elevatorNum = elevatorApi.getElevatorNum();
+        for(int i = 0; i < elevatorNum; i ++) {
+
+            Elevator elevator = building.getElevator(i);
+
+            if (elevator == null) {
+                elevator = createElevator(floors, i);
+
+                List<Elevator> elevators = building.getElevators();
+                elevators.add(elevator);
+
+                building.setElevators(elevators);
+            }
+
             updateElevator(floors, elevator.getNumber());
         }
     }
