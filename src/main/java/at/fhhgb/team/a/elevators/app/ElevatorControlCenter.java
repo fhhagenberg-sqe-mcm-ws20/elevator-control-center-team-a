@@ -221,7 +221,7 @@ public class ElevatorControlCenter {
                         e.addFloorService(f, pressed);
                     }
                 } catch (RemoteException ex) {
-                    ex.printStackTrace();
+                    System.out.println("Floor service assignment not possible");
                 }
             });
         });
