@@ -2,9 +2,6 @@ package at.fhhgb.team.a.elevators.app;
 
 import at.fhhgb.team.a.elevators.factory.ViewModelFactory;
 import at.fhhgb.team.a.elevators.model.Building;
-import at.fhhgb.team.a.elevators.model.Elevator;
-import at.fhhgb.team.a.elevators.model.Floor;
-import at.fhhgb.team.a.elevators.model.Position;
 import at.fhhgb.team.a.elevators.provider.ViewModelProvider;
 import at.fhhgb.team.a.elevators.view.*;
 import at.fhhgb.team.a.elevators.viewmodels.ElevatorViewModel;
@@ -28,13 +25,20 @@ import java.util.List;
  */
 public class App extends Application {
 
-    @Override
-    public void start(Stage stage) throws RemoteException, NotBoundException, MalformedURLException {
+    private ElevatorControlCenter controlCenter;
+
+    public App() throws RemoteException, NotBoundException, MalformedURLException {
         IElevator elevatorApi = (IElevator) Naming.lookup("rmi://localhost/ElevatorSim");
+        controlCenter = new ElevatorControlCenter(elevatorApi);
+    }
 
-        ElevatorControlCenter controlCenter = new ElevatorControlCenter(elevatorApi);
-        controlCenter.startPolling();
+    public App(ElevatorControlCenter controlCenter) {
+        this.controlCenter = controlCenter;
+    }
 
+    @Override
+    public void start(Stage stage) throws RemoteException {
+        controlCenter.pollElevatorApi();
         Building building = controlCenter.getBuilding();
         ViewModelFactory viewModelFactory = new ViewModelFactory(building);
         ViewModelProvider viewModelProvider = new ViewModelProvider(viewModelFactory);

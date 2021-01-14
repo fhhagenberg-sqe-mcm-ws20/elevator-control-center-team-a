@@ -2,6 +2,7 @@ package at.fhhgb.team.a.elevators.view;
 
 import at.fhhgb.team.a.elevators.viewmodels.ElevatorFloorViewModel;
 import at.fhhgb.team.a.elevators.viewmodels.ElevatorViewModel;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -20,28 +21,30 @@ import java.util.List;
 
 public class ElevatorView extends HBox {
 
+    private ElevatorViewModel viewModel;
     private final List<ElevatorFloorViewModel> elevatorFloorViewModelList;
 
     public ElevatorView(ElevatorViewModel viewModel, List<ElevatorFloorViewModel> elevatorFloorVM) {
         super();
+        this.viewModel = viewModel;
         this.elevatorFloorViewModelList = elevatorFloorVM;
 
-        this.getChildren().add(createInformationalColumn(viewModel));
-        this.getChildren().add(createFloorColumn(viewModel));
+        this.getChildren().add(createInformationalColumn());
+        this.getChildren().add(createFloorColumn());
 
         this.setSpacing(8);
         this.setPadding(new Insets(16));
         this.setBackground(new Background(new BackgroundFill(Color.rgb(242, 242, 242), new CornerRadii(8), Insets.EMPTY)));
     }
 
-    private VBox createFloorColumn(ElevatorViewModel viewModel) {
+    private VBox createFloorColumn() {
         var vbox = new VBox();
         vbox.setSpacing(2);
 
         elevatorFloorViewModelList.sort(Comparator.comparing(ElevatorFloorViewModel::getNumber).reversed());
         for (ElevatorFloorViewModel floorViewModel : elevatorFloorViewModelList) {
             var floorButton = new Button();
-            floorButton.idProperty().bind(floorViewModel.getTitle());
+            floorButton.idProperty().bind(floorViewModel.getId());
             floorButton.textProperty().bind(floorViewModel.getTitle());
             floorButton.textFillProperty().bind(floorViewModel.getTitleFill());
             floorButton.backgroundProperty().bind(floorViewModel.getButtonBackground());
@@ -52,7 +55,7 @@ public class ElevatorView extends HBox {
         return vbox;
     }
 
-    private VBox createInformationalColumn(ElevatorViewModel viewModel) {
+    private VBox createInformationalColumn() {
         var vbox = new VBox();
         vbox.setSpacing(8);
         vbox.setAlignment(Pos.CENTER_LEFT);
@@ -73,16 +76,19 @@ public class ElevatorView extends HBox {
 
         vbox.getChildren().add(titleBox);
 
-        vbox.getChildren().add(createTextWithBinding(viewModel.getSpeed()));
-        vbox.getChildren().add(createTextWithBinding(viewModel.getCapacity()));
-        vbox.getChildren().add(createTextWithBinding(viewModel.getWeight()));
-        vbox.getChildren().add(createTextWithBinding(viewModel.getDoorStatus()));
+        vbox.getChildren().add(createTextWithBinding("speed", viewModel.getSpeed()));
+        vbox.getChildren().add(createTextWithBinding("capacity", viewModel.getCapacity()));
+        vbox.getChildren().add(createTextWithBinding("weight", viewModel.getWeight()));
+        vbox.getChildren().add(createTextWithBinding("doorStatus", viewModel.getDoorStatus()));
 
         return vbox;
     }
 
-    private Text createTextWithBinding(StringProperty property) {
+    private Text createTextWithBinding(String id, StringProperty property) {
         var textField = new Text();
+
+        String idString = viewModel.getId().get() + "-" + id;
+        textField.idProperty().bind(new SimpleStringProperty(idString));
         textField.textProperty().bind(property);
         textField.setFont(Font.font("Arial", FontWeight.LIGHT, 10));
         return textField;
