@@ -17,10 +17,17 @@ public class Button {
     }
 
     /**
-     * Sets the status of the button to the opposite (on/off).
+     * Sets the status of the button to on (pressed).
      */
     public void press() {
-        isOn = !isOn;
+        isOn = true;
+    }
+
+    /**
+     * Resets the status of the button to off (not pressed).
+     */
+    public void clear() {
+        isOn = false;
     }
 }
 

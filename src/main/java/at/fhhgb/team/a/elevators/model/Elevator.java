@@ -157,7 +157,7 @@ public class Elevator extends Observable {
     public void setTarget(Floor target) {
         this.target = target;
         setChanged();
-        notifyObservers();
+        notifyObservers(this);
     }
 
     /**
@@ -183,6 +183,12 @@ public class Elevator extends Observable {
 
     public void setSpeed(float speed) {
         this.speed = speed;
+        setChanged();
+        notifyObservers();
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
         setChanged();
         notifyObservers();
     }

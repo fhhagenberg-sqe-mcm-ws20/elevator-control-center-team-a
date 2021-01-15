@@ -10,6 +10,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import sqelevator.IElevator;
 
 import java.net.MalformedURLException;
@@ -19,6 +20,9 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * JavaFX App
@@ -26,10 +30,10 @@ import java.util.List;
 public class App extends Application {
 
     private ElevatorControlCenter controlCenter;
+    private ScheduledExecutorService executorService;
 
-    public App() throws RemoteException, NotBoundException, MalformedURLException {
-        IElevator elevatorApi = (IElevator) Naming.lookup("rmi://localhost/ElevatorSim");
-        controlCenter = new ElevatorControlCenter(elevatorApi);
+    public App() {
+        establishConnection();
     }
 
     public App(ElevatorControlCenter controlCenter) {
@@ -39,6 +43,9 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws RemoteException {
         controlCenter.pollElevatorApi();
+        executorService = Executors.newScheduledThreadPool(1);
+        executorService.scheduleAtFixedRate(controlCenter, 0, 1, TimeUnit.SECONDS);
+
         Building building = controlCenter.getBuilding();
         ViewModelFactory viewModelFactory = new ViewModelFactory(building);
         ViewModelProvider viewModelProvider = new ViewModelProvider(viewModelFactory);
@@ -62,7 +69,19 @@ public class App extends Application {
         var scene = new Scene(layout, 640, 660);
 
         stage.setScene(scene);
+        stage.setOnCloseRequest(this::onApplicationClose);
         stage.show();
+    }
+
+    private void establishConnection() {
+        try {
+            IElevator elevatorApi = (IElevator) Naming.lookup("rmi://localhost/ElevatorSim");
+            controlCenter = new ElevatorControlCenter(elevatorApi);
+        } catch (MalformedURLException | NotBoundException | RemoteException e) {
+            //retry
+            //TODO window not yet visible: show error message
+            establishConnection();
+        }
     }
 
     private List<ElevatorView> initElevatorViews(ViewModelProvider viewModelProvider) {
@@ -75,6 +94,10 @@ public class App extends Application {
             elevatorViews.add(new ElevatorView(elevatorViewModel, elevatorFloorVM));
         });
         return elevatorViews;
+    }
+
+    private void onApplicationClose(WindowEvent windowEvent) {
+        executorService.shutdown();
     }
 
     public static void main(String[] args) {

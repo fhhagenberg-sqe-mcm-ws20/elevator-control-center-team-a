@@ -1,22 +1,20 @@
 package at.fhhgb.team.a.elevators.app;
 
-import sqelevator.IElevator;
 import at.fhhgb.team.a.elevators.model.*;
+import sqelevator.IElevator;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-public class ElevatorControlCenter {
+public class ElevatorControlCenter implements Runnable {
 
     /**
      * Elevator that is controlled by this center
      */
-    private IElevator elevatorApi;
+    private final IElevator elevatorApi;
 
     /**
      * The building used in the elevator control center.
@@ -30,21 +28,16 @@ public class ElevatorControlCenter {
 
     public ElevatorControlCenter(IElevator elevatorApi) {
         this.elevatorApi = elevatorApi;
+        lastUpdateTick = -1;
     }
 
-    public void startPolling() throws RemoteException {
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-
-        Runnable runnable = () -> {
-            try {
-                pollElevatorApi();
-            } catch (RemoteException e) {
-                Thread thread = Thread.currentThread();
-                thread.getUncaughtExceptionHandler().uncaughtException(thread, e);
-            }
-        };
-
-        executorService.scheduleAtFixedRate(runnable, 0, 10, TimeUnit.SECONDS);
+    @Override
+    public void run() {
+        try {
+            pollElevatorApi();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     public void pollElevatorApi() throws RemoteException {
@@ -84,7 +77,7 @@ public class ElevatorControlCenter {
 
             if (floor == null) {
                 floor = new Floor(i);
-
+                floor.clearButtonState();
                 List<Floor> floors = building.getFloors();
                 floors.add(floor);
 
@@ -93,6 +86,7 @@ public class ElevatorControlCenter {
 
             if(buttonDown) {
                 floor.pressDownButton();
+                System.out.println(floor.getNumber());
             }
 
             if(buttonUp) {
@@ -123,6 +117,7 @@ public class ElevatorControlCenter {
             if (elevator != null) {
                 updateElevator(floors, elevator.getNumber());
             }
+            elevator.addObserver(this::update);
         }
     }
 
@@ -142,6 +137,7 @@ public class ElevatorControlCenter {
         int elevatorDoorStatus = elevatorApi.getElevatorDoorStatus(elevatorNumber);
         int elevatorPosition = elevatorApi.getElevatorPosition(elevatorNumber);
         int elevatorSpeed = elevatorApi.getElevatorSpeed(elevatorNumber);
+        int weight = elevatorApi.getElevatorWeight(elevatorNumber);
         Position currentPosition = new Position(elevatorPosition, closestFloor.get());
 
         Elevator elevator = building.getElevator(elevatorNumber);
@@ -151,10 +147,21 @@ public class ElevatorControlCenter {
         elevator.setDoorStatus(DoorStatus.fromNumber(elevatorDoorStatus));
         elevator.setTarget(targetFloor.get());
         elevator.setCurrentPosition(currentPosition);
+        elevator.setWeight(weight);
     }
 
     public Building getBuilding() {
         return this.building;
+    }
+
+    private void update(Observable o, Object arg) {
+        if (arg instanceof Elevator) {
+            try {
+                elevatorApi.setTarget(((Elevator) arg).getNumber(), ((Elevator) arg).getTarget().getNumber());
+            } catch (RemoteException e) {
+                System.out.println(e);
+            }
+        }
     }
 
     private Building createBuilding(List<Floor> floors, List<Elevator> elevators) throws RemoteException {
@@ -214,6 +221,7 @@ public class ElevatorControlCenter {
             boolean buttonUp = elevatorApi.getFloorButtonUp(i);
 
             Floor floor = new Floor(i);
+            floor.clearButtonState();
 
             if(buttonDown) {
                 floor.pressDownButton();
