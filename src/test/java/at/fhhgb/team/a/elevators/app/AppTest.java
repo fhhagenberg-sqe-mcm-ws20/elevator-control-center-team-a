@@ -104,36 +104,6 @@ public class AppTest {
     }
 
     @Test
-    void testFloorButtonsPressed(FxRobot robot) throws RemoteException {
-        Floor floor = controlCenter.getBuilding().getFloor(1);
-        assertThat(floor.isUpButtonOn()).isFalse();
-
-        // Go into manual mode
-        verifyThat("#modeButton", isVisible());
-        verifyThat("#modeButton", hasText("Auto"));
-
-        robot.clickOn("#modeButton");
-
-        verifyThat("#modeButton", isVisible());
-        verifyThat("#modeButton", hasText("Manual"));
-
-        // Click on floor buttons
-        verifyThat("#f1-up", isVisible());
-        robot.clickOn("#f1-up");
-
-        verifyThat("#f1-down", isVisible());
-        robot.clickOn("#f1-down");
-
-        // Assert that the API call has been executed
-        controlCenter.pollElevatorApi();
-        floor = controlCenter.getBuilding().getFloor(1);
-
-        assertThat(floor.isUpButtonOn()).isTrue();
-        assertThat(floor.isDownButtonOn()).isTrue();
-    }
-
-
-    @Test
     void testElevatorSpeedChange(FxRobot robot) throws RemoteException {
         // Assert that the GUI shows the default values
         verifyThat("#e0-speed", isVisible());
