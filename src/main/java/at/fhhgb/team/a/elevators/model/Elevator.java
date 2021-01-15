@@ -151,13 +151,22 @@ public class Elevator extends Observable {
     }
 
     /**
+     * Sets the state of a button of a specific floor on the elevator
+     */
+    public void setFloorButton(Floor floor, boolean isPressed) {
+        elevatorButtons.put(floor, isPressed);
+    }
+
+    /**
      * Sets the floor target of the elevator.
      * @param target floor number which the specified elevator is to target
      */
     public void setTarget(Floor target) {
-        this.target = target;
-        setChanged();
-        notifyObservers(this);
+        if (this.target != target) {
+            this.target = target;
+            setChanged();
+            notifyObservers(this);
+        }
     }
 
     /**
@@ -166,8 +175,6 @@ public class Elevator extends Observable {
      */
     public void setCommittedDirection(Direction committedDirection) {
         this.committedDirection = committedDirection;
-        setChanged();
-        notifyObservers();
     }
 
     /**
@@ -183,35 +190,30 @@ public class Elevator extends Observable {
 
     public void setSpeed(float speed) {
         this.speed = speed;
-        setChanged();
-        notifyObservers();
     }
 
     public void setWeight(int weight) {
         this.weight = weight;
-        setChanged();
-        notifyObservers();
     }
 
     public void setAcceleration(float acceleration) {
         this.acceleration = acceleration;
-        setChanged();
-        notifyObservers();
     }
 
     public void setCurrentPosition(Position currentPosition) {
         this.currentPosition = currentPosition;
-        setChanged();
-        notifyObservers();
     }
 
     public void setDoorStatus(DoorStatus doorStatus) {
         this.doorStatus = doorStatus;
-        setChanged();
-        notifyObservers();
     }
 
     public List<Floor> getFloors() {
         return new ArrayList<>(elevatorButtons.keySet());
+    }
+
+    public void updated() {
+        setChanged();
+        notifyObservers();
     }
 }

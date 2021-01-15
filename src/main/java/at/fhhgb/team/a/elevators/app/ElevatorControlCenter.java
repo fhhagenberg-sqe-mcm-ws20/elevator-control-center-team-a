@@ -77,16 +77,15 @@ public class ElevatorControlCenter implements Runnable {
 
             if (floor == null) {
                 floor = new Floor(i);
-                floor.clearButtonState();
                 List<Floor> floors = building.getFloors();
                 floors.add(floor);
 
                 building.setFloors(floors);
             }
 
+            floor.clearButtonState();
             if(buttonDown) {
                 floor.pressDownButton();
-                System.out.println(floor.getNumber());
             }
 
             if(buttonUp) {
@@ -141,6 +140,7 @@ public class ElevatorControlCenter implements Runnable {
         Position currentPosition = new Position(elevatorPosition, closestFloor.get());
 
         Elevator elevator = building.getElevator(elevatorNumber);
+        updateElevatorButtons(elevator);
         elevator.setCommittedDirection(Direction.fromNumber(committedDirection));
         elevator.setSpeed(elevatorSpeed);
         elevator.setAcceleration(elevatorAccel);
@@ -148,6 +148,7 @@ public class ElevatorControlCenter implements Runnable {
         elevator.setTarget(targetFloor.get());
         elevator.setCurrentPosition(currentPosition);
         elevator.setWeight(weight);
+        elevator.updated();
     }
 
     public Building getBuilding() {
@@ -250,6 +251,17 @@ public class ElevatorControlCenter implements Runnable {
                     System.out.println("Floor service assignment not possible");
                 }
             });
+        });
+    }
+
+    private void updateElevatorButtons(Elevator elevator) {
+        elevator.getFloors().stream().forEach(floor -> {
+            try {
+                boolean isPressed = elevatorApi.getElevatorButton(elevator.getNumber(), floor.getNumber());
+                elevator.setFloorButton(floor, isPressed);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         });
     }
 }
