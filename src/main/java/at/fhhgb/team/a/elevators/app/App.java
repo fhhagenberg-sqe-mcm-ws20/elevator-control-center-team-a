@@ -70,18 +70,17 @@ public class App extends Application {
 
     private void establishConnection(IElevator ignore) {
         Platform.runLater(() -> {
-            hideWaitingMessage();
             startPolling();
             initECCView();
         });
     }
 
-    void hideWaitingMessage() {
+    private void hideWaitingMessage() {
         rootLayout.getChildren().clear();
     }
 
     void initECCView() {
-        hideWaitingMessage(); //TODO mb delete this call or other call
+        hideWaitingMessage();
 
         Building building = controlCenter.getBuilding();
         ViewModelFactory viewModelFactory = new ViewModelFactory(building);

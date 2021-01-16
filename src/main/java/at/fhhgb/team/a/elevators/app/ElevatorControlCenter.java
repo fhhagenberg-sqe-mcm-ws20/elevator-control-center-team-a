@@ -16,9 +16,25 @@ import java.util.concurrent.TimeUnit;
 
 public class ElevatorControlCenter implements IElevatorSystem {
 
+    /**
+     * Callback to the App to indicate that the connection is established and
+     * the {@link ElevatorControlCenter#building} created.
+     */
     private ConnectionCallback callback;
+
+    /**
+     * Starts the connection process in another thread.
+     */
     private ScheduledExecutorService executorService;
+
+    /**
+     * Flag to not poll the API until a connection is established
+     */
     private boolean connected = false;
+
+    /**
+     * RMI URL endpoint
+     */
     private String connectionURL = "";
 
     /**
@@ -60,35 +76,10 @@ public class ElevatorControlCenter implements IElevatorSystem {
         }
     }
 
-    private void waitForConnection(ConnectionCallback callback) {
-        executorService = Executors.newScheduledThreadPool(1);
-        ConnectionService rmiService = new ConnectionService(connectionURL, callback);
-        executorService.scheduleWithFixedDelay(rmiService, 0, 500, TimeUnit.MILLISECONDS);
-    }
-
-    private void reconnected(IElevator elevatorApi) {
-        this.elevatorApi = elevatorApi;
-        connected = true;
-        executorService.shutdown();
-        callback.connectionEstablished(elevatorApi);
-    }
-
-    private void connected(IElevator elevatorApi) {
-        this.elevatorApi = elevatorApi;
-        connected = true;
-        executorService.shutdown();
-
-        while (null == building) {
-            try {
-                pollElevatorApi();
-            } catch (ElevatorSystemException e) {
-                connected = false;
-                waitForConnection(this::connected);
-            }
-        }
-        callback.connectionEstablished(elevatorApi);
-    }
-
+    /**
+     * Updates the {@link ElevatorControlCenter#building} by polling new values from the API
+     * @throws ElevatorSystemException when a connection issue arises 
+     */
     public void pollElevatorApi() throws ElevatorSystemException {
         long startTick;
         try {
@@ -135,6 +126,35 @@ public class ElevatorControlCenter implements IElevatorSystem {
 
     public Building getBuilding() {
         return this.building;
+    }
+
+    private void waitForConnection(ConnectionCallback callback) {
+        executorService = Executors.newScheduledThreadPool(1);
+        ConnectionService rmiService = new ConnectionService(connectionURL, callback);
+        executorService.scheduleWithFixedDelay(rmiService, 0, 500, TimeUnit.MILLISECONDS);
+    }
+
+    private void reconnected(IElevator elevatorApi) {
+        this.elevatorApi = elevatorApi;
+        connected = true;
+        executorService.shutdown();
+        callback.connectionEstablished(elevatorApi);
+    }
+
+    private void connected(IElevator elevatorApi) {
+        this.elevatorApi = elevatorApi;
+        connected = true;
+        executorService.shutdown();
+
+        while (null == building) {
+            try {
+                pollElevatorApi();
+            } catch (ElevatorSystemException e) {
+                connected = false;
+                waitForConnection(this::connected);
+            }
+        }
+        callback.connectionEstablished(elevatorApi);
     }
 
     private void updateBuilding(List<Floor> floors, List<Elevator> elevators) throws RemoteException {
