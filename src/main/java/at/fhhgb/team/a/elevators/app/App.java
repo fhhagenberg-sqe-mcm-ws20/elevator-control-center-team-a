@@ -44,6 +44,10 @@ public class App extends Application {
         this.controlCenter = controlCenter;
     }
 
+    public static void main(String[] args) {
+        launch();
+    }
+
     @Override
     public void start(Stage stage) {
 
@@ -66,17 +70,6 @@ public class App extends Application {
             ElevatorSystemFactory eccFactory = new ElevatorSystemFactory();
             controlCenter = eccFactory.getElevatorSystem("RMI", "rmi://localhost/ElevatorSim", this::establishConnection);
         }
-    }
-
-    private void establishConnection(IElevator ignore) {
-        Platform.runLater(() -> {
-            startPolling();
-            initECCView();
-        });
-    }
-
-    private void hideWaitingMessage() {
-        rootLayout.getChildren().clear();
     }
 
     void initECCView() {
@@ -103,6 +96,17 @@ public class App extends Application {
         rootLayout.getChildren().add(buildingView);
     }
 
+    private void establishConnection(IElevator ignore) {
+        Platform.runLater(() -> {
+            startPolling();
+            initECCView();
+        });
+    }
+
+    private void hideWaitingMessage() {
+        rootLayout.getChildren().clear();
+    }
+
     private void startPolling() {
         executorService.scheduleAtFixedRate(controlCenter, 0, 1, TimeUnit.SECONDS);
     }
@@ -124,9 +128,4 @@ public class App extends Application {
             executorService.shutdown();
         }
     }
-
-    public static void main(String[] args) {
-        launch();
-    }
-
 }

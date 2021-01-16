@@ -78,7 +78,7 @@ public class ElevatorControlCenter implements IElevatorSystem {
 
     /**
      * Updates the {@link ElevatorControlCenter#building} by polling new values from the API
-     * @throws ElevatorSystemException when a connection issue arises 
+     * @throws ElevatorSystemException when a connection issue arises
      */
     public void pollElevatorApi() throws ElevatorSystemException {
         long startTick;
