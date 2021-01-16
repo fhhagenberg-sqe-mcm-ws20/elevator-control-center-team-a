@@ -1,5 +1,6 @@
 package at.fhhgb.team.a.elevators.app;
 
+import at.fhhgb.team.a.elevators.exceptions.ElevatorSystemException;
 import sqelevator.IElevator;
 import at.fhhgb.team.a.elevators.model.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +32,7 @@ class ElevatorControlCenterTest {
 
         @Test
         @DisplayName("creates a building with the correct number of Floors")
-        void testNumberOfFloors() throws RemoteException {
+        void testNumberOfFloors() throws ElevatorSystemException, RemoteException {
             int numberOfFloors = 2;
 
             Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
@@ -46,7 +47,7 @@ class ElevatorControlCenterTest {
 
         @Test
         @DisplayName("creates a building with the correct number of Elevators")
-        void testNumberOfElevators() throws RemoteException {
+        void testNumberOfElevators() throws ElevatorSystemException, RemoteException {
             int numberOfElevators = 2;
 
             Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
@@ -62,7 +63,7 @@ class ElevatorControlCenterTest {
 
         @Test
         @DisplayName("creates a building with the correct ground floor")
-        void testGroundFloorIsCorrect() throws RemoteException {
+        void testGroundFloorIsCorrect() throws ElevatorSystemException, RemoteException {
             int floorHeight = 100;
             int groundFloorNum = 0;
 
@@ -79,7 +80,7 @@ class ElevatorControlCenterTest {
 
         @Test
         @DisplayName("creates a building with the correct elevators")
-        void testElevatorsAreCorrect() throws RemoteException {
+        void testElevatorsAreCorrect() throws ElevatorSystemException, RemoteException {
             int capacity = 100;
             int speed = 10;
             int acceleration = 5;
@@ -114,7 +115,7 @@ class ElevatorControlCenterTest {
 
         @Test
         @DisplayName("creates a building with correct elevator floor service")
-        void testElevatorsServiceCorrectFloors() throws RemoteException {
+        void testElevatorsServiceCorrectFloors() throws ElevatorSystemException, RemoteException {
             Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
             Mockito.when(elevatorApi.getFloorNum()).thenReturn(3);
             Mockito.when(elevatorApi.getElevatorNum()).thenReturn(2);
@@ -140,7 +141,7 @@ class ElevatorControlCenterTest {
 
         @Test
         @DisplayName("creates a building with correct elevator position")
-        void testForCorrectElevatorPosition() throws RemoteException {
+        void testForCorrectElevatorPosition() throws ElevatorSystemException, RemoteException {
             int positionInFeet0 = 0;
             int positionInFeet1 = 50;
             int currentFloorElevator0 = 0;
@@ -174,7 +175,7 @@ class ElevatorControlCenterTest {
 
         @Test
         @DisplayName("updates a building on the next clock tick")
-        void testForUpdatedElevatorWithNewTick() throws RemoteException {
+        void testForUpdatedElevatorWithNewTick() throws ElevatorSystemException, RemoteException {
             Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
             Mockito.when(elevatorApi.getFloorNum()).thenReturn(1);
             controlCenter.pollElevatorApi();
@@ -194,7 +195,7 @@ class ElevatorControlCenterTest {
 
         @Test
         @DisplayName("skips update on same clock tick")
-        void testForSkippedUpdateWhenTickDidNotChange() throws RemoteException {
+        void testForSkippedUpdateWhenTickDidNotChange() throws ElevatorSystemException, RemoteException {
             Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
             Mockito.when(elevatorApi.getFloorNum()).thenReturn(1);
             controlCenter.pollElevatorApi();
@@ -212,7 +213,7 @@ class ElevatorControlCenterTest {
 
         @Test
         @DisplayName("retries update when clock tick changes in between processing")
-        void testForUpdatedElevatorWithChangingTickBetweenUpdate() throws RemoteException {
+        void testForUpdatedElevatorWithChangingTickBetweenUpdate() throws ElevatorSystemException, RemoteException {
             Mockito.when(elevatorApi.getClockTick()).thenReturn(1L).thenReturn(2L);
             Mockito.when(elevatorApi.getFloorNum()).thenReturn(1).thenReturn(2);
             controlCenter.pollElevatorApi();
@@ -223,7 +224,7 @@ class ElevatorControlCenterTest {
 
         @Test
         @DisplayName("creates a building with correct floor buttons")
-        void testForCorrectFloorButtons() throws RemoteException {
+        void testForCorrectFloorButtons() throws ElevatorSystemException, RemoteException {
             Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
             Mockito.when(elevatorApi.getFloorNum()).thenReturn(3);
             Mockito.when(elevatorApi.getFloorButtonDown(0)).thenReturn(false);
@@ -249,7 +250,7 @@ class ElevatorControlCenterTest {
 
         @Test
         @DisplayName("creates a building with a targeted elevator")
-        void testForCorrectTarget() throws RemoteException {
+        void testForCorrectTarget() throws ElevatorSystemException, RemoteException {
             int targetFloorNumber = 0;
             int elevatorNumber = 1;
             boolean downButtonPressedOnTargetFloor = true;

@@ -1,5 +1,6 @@
 package at.fhhgb.team.a.elevators.app;
 
+import at.fhhgb.team.a.elevators.exceptions.ElevatorSystemException;
 import at.fhhgb.team.a.elevators.model.Direction;
 import at.fhhgb.team.a.elevators.model.DoorStatus;
 import at.fhhgb.team.a.elevators.model.Elevator;
@@ -13,8 +14,6 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 import sqelevator.IElevator;
 
-import java.net.MalformedURLException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,14 +33,16 @@ public class AppTest {
      * @param stage - Will be injected by the test runner.
      */
     @Start
-    public void start(Stage stage) throws RemoteException, MalformedURLException, NotBoundException {
+    public void start(Stage stage) throws RemoteException, ElevatorSystemException {
         elevatorApi = Mockito.mock(IElevator.class);
         controlCenter = new ElevatorControlCenter(elevatorApi);
 
         setupMockup();
 
+        controlCenter.pollElevatorApi();
         var app = new App(controlCenter);
         app.start(stage);
+        app.initECCView();
     }
 
     private void setupMockup() throws RemoteException {
@@ -73,7 +74,7 @@ public class AppTest {
     }
 
     @Test
-    void testElevatorFloorButtonClick(FxRobot robot) throws RemoteException {
+    void testElevatorFloorButtonClick(FxRobot robot) throws ElevatorSystemException {
         Elevator elevator = controlCenter.getBuilding().getElevator(0);
         
         // Assert that the default target number is set
@@ -104,7 +105,7 @@ public class AppTest {
     }
 
     @Test
-    void testElevatorSpeedChange(FxRobot robot) throws RemoteException {
+    void testElevatorSpeedChange(FxRobot robot) throws RemoteException, ElevatorSystemException {
         // Assert that the GUI shows the default values
         verifyThat("#e0-speed", isVisible());
         verifyThat("#e0-speed", hasText("speed: 10.0 km/h"));

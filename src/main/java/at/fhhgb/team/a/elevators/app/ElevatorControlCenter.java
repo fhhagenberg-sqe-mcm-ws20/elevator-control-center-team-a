@@ -1,5 +1,7 @@
 package at.fhhgb.team.a.elevators.app;
 
+import at.fhhgb.team.a.elevators.RMI.ConnectionService;
+import at.fhhgb.team.a.elevators.exceptions.ElevatorSystemException;
 import at.fhhgb.team.a.elevators.model.*;
 import sqelevator.IElevator;
 
@@ -8,13 +10,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-public class ElevatorControlCenter implements Runnable {
+public class ElevatorControlCenter implements IElevatorSystem {
+
+    private ConnectionCallback callback;
+    private ScheduledExecutorService executorService;
+    private boolean connected = false;
+    private String connectionURL = "";
 
     /**
      * Elevator that is controlled by this center
      */
-    private final IElevator elevatorApi;
+    private IElevator elevatorApi;
 
     /**
      * The building used in the elevator control center.
@@ -28,37 +38,92 @@ public class ElevatorControlCenter implements Runnable {
 
     public ElevatorControlCenter(IElevator elevatorApi) {
         this.elevatorApi = elevatorApi;
+        connected = true;
         lastUpdateTick = -1;
+    }
+
+    public ElevatorControlCenter(String connectionURL, ConnectionCallback callback) {
+        this.callback = callback;
+        this.connectionURL = connectionURL;
+        waitForConnection(this::connected);
     }
 
     @Override
     public void run() {
         try {
-            pollElevatorApi();
-        } catch (RemoteException e) {
-            e.printStackTrace();
+            if (connected) {
+                pollElevatorApi();
+            }
+        } catch (ElevatorSystemException e) {
+            connected = false;
+            waitForConnection(this::reconnected);
         }
     }
 
-    public void pollElevatorApi() throws RemoteException {
-        long startTick = elevatorApi.getClockTick();
+    private void waitForConnection(ConnectionCallback callback) {
+        executorService = Executors.newScheduledThreadPool(1);
+        ConnectionService rmiService = new ConnectionService(connectionURL, callback);
+        executorService.scheduleWithFixedDelay(rmiService, 0, 500, TimeUnit.MILLISECONDS);
+    }
+
+    private void reconnected(IElevator elevatorApi) {
+        this.elevatorApi = elevatorApi;
+        connected = true;
+        executorService.shutdown();
+        callback.connectionEstablished(elevatorApi);
+    }
+
+    private void connected(IElevator elevatorApi) {
+        this.elevatorApi = elevatorApi;
+        connected = true;
+        executorService.shutdown();
+
+        while (null == building) {
+            try {
+                pollElevatorApi();
+            } catch (ElevatorSystemException e) {
+                connected = false;
+                waitForConnection(this::connected);
+            }
+        }
+        callback.connectionEstablished(elevatorApi);
+    }
+
+    public void pollElevatorApi() throws ElevatorSystemException {
+        long startTick;
+        try {
+            startTick = elevatorApi.getClockTick();
+        } catch (RemoteException e) {
+            throw new ElevatorSystemException("Failed to poll clock tick.", e);
+        }
 
         if(startTick == lastUpdateTick) {
             // we already updated to that state
             return;
         }
 
-        List<Floor> floors = createFloors();
-        List<Elevator> elevators = createElevators(floors);
+        List<Floor> floors;
+        List<Elevator> elevators;
+        try {
+            floors = createFloors();
+            elevators = createElevators(floors);
+        } catch (RemoteException e) {
+            throw new ElevatorSystemException("Failed to poll floors and elevators.", e);
+        }
+
         addFloorServiceAssignments(elevators, floors);
-        long endTick = elevatorApi.getClockTick();
+        long endTick;
+        try {
+            endTick = elevatorApi.getClockTick();
+        } catch (RemoteException e) {
+            throw new ElevatorSystemException("Failed to poll clock tick.", e);
+        }
 
         if(startTick == endTick) {
-            if(building == null) {
-                building = createBuilding(floors, elevators);
-            } else {
-                updateFloors();
-                updateElevators(building.getFloors());
+            try {
+                updateBuilding(floors, elevators);
+            } catch (RemoteException rException) {
+                throw new ElevatorSystemException("Failed to poll floors and elevators.", rException);
             }
             lastUpdateTick = startTick;
         } else {
@@ -67,7 +132,21 @@ public class ElevatorControlCenter implements Runnable {
         }
     }
 
-    public void updateFloors() throws RemoteException {
+
+    public Building getBuilding() {
+        return this.building;
+    }
+
+    private void updateBuilding(List<Floor> floors, List<Elevator> elevators) throws RemoteException {
+        if(building == null) {
+            building = createBuilding(floors, elevators);
+        } else {
+            updateFloors();
+            updateElevators(building.getFloors());
+        }
+    }
+
+    private void updateFloors() throws RemoteException {
         int floorNum = elevatorApi.getFloorNum();
         for(int i = 0; i < floorNum; i ++) {
             boolean buttonDown = elevatorApi.getFloorButtonDown(i);
@@ -94,7 +173,7 @@ public class ElevatorControlCenter implements Runnable {
         }
     }
 
-    public void updateElevators(List<Floor> floors) throws RemoteException {
+    private void updateElevators(List<Floor> floors) throws RemoteException {
         for (Elevator elevator: building.getElevators()) {
             updateElevator(floors, elevator.getNumber());
         }
@@ -115,12 +194,12 @@ public class ElevatorControlCenter implements Runnable {
 
             if (elevator != null) {
                 updateElevator(floors, elevator.getNumber());
+                elevator.addObserver(this::update);
             }
-            elevator.addObserver(this::update);
         }
     }
 
-    public void updateElevator(List<Floor> floors, int elevatorNumber) throws RemoteException {
+    private void updateElevator(List<Floor> floors, int elevatorNumber) throws RemoteException {
         int target = elevatorApi.getTarget(elevatorNumber);
         int elevatorFloor = elevatorApi.getElevatorFloor(elevatorNumber);
         Optional<Floor> targetFloor = floors.stream().filter(f -> f.getNumber() == target).findFirst();
@@ -149,10 +228,6 @@ public class ElevatorControlCenter implements Runnable {
         elevator.setCurrentPosition(currentPosition);
         elevator.setWeight(weight);
         elevator.updated();
-    }
-
-    public Building getBuilding() {
-        return this.building;
     }
 
     private void update(Observable o, Object arg) {

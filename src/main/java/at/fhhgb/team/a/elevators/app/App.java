@@ -1,22 +1,24 @@
 package at.fhhgb.team.a.elevators.app;
 
+import at.fhhgb.team.a.elevators.factory.ElevatorSystemFactory;
 import at.fhhgb.team.a.elevators.factory.ViewModelFactory;
 import at.fhhgb.team.a.elevators.model.Building;
 import at.fhhgb.team.a.elevators.provider.ViewModelProvider;
 import at.fhhgb.team.a.elevators.view.*;
 import at.fhhgb.team.a.elevators.viewmodels.ElevatorViewModel;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import sqelevator.IElevator;
 
-import java.net.MalformedURLException;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -29,22 +31,57 @@ import java.util.concurrent.TimeUnit;
  */
 public class App extends Application {
 
-    private ElevatorControlCenter controlCenter;
-    private ScheduledExecutorService executorService;
+    private IElevatorSystem controlCenter;
+    private final ScheduledExecutorService executorService;
+    private VBox rootLayout;
 
     public App() {
-        establishConnection();
+        executorService = Executors.newScheduledThreadPool(1);
     }
 
-    public App(ElevatorControlCenter controlCenter) {
+    public App(IElevatorSystem controlCenter) {
+        this();
         this.controlCenter = controlCenter;
     }
 
     @Override
-    public void start(Stage stage) throws RemoteException {
-        controlCenter.pollElevatorApi();
-        executorService = Executors.newScheduledThreadPool(1);
-        executorService.scheduleAtFixedRate(controlCenter, 0, 1, TimeUnit.SECONDS);
+    public void start(Stage stage) {
+
+        var progressBar = new ProgressBar();
+        progressBar.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+        var infoMsg = new Label("Please wait. We are trying to connect to the Elevatorsystem.");
+
+        rootLayout = new VBox();
+        rootLayout.setAlignment(Pos.CENTER);
+        rootLayout.getChildren().add(progressBar);
+        rootLayout.getChildren().add(infoMsg);
+
+        var scene = new Scene(rootLayout, 640, 660);
+
+        stage.setScene(scene);
+        stage.setOnCloseRequest(this::onApplicationClose);
+        stage.show();
+
+        if (null == controlCenter) {
+            ElevatorSystemFactory eccFactory = new ElevatorSystemFactory();
+            controlCenter = eccFactory.getElevatorSystem("RMI", "rmi://localhost/ElevatorSim", this::establishConnection);
+        }
+    }
+
+    private void establishConnection(IElevator ignore) {
+        Platform.runLater(() -> {
+            hideWaitingMessage();
+            startPolling();
+            initECCView();
+        });
+    }
+
+    void hideWaitingMessage() {
+        rootLayout.getChildren().clear();
+    }
+
+    void initECCView() {
+        hideWaitingMessage(); //TODO mb delete this call or other call
 
         Building building = controlCenter.getBuilding();
         ViewModelFactory viewModelFactory = new ViewModelFactory(building);
@@ -61,27 +98,14 @@ public class App extends Application {
 
         var buildingView = new BuildingView(elevatorsView, floorsView);
 
-        var layout = new VBox();
         VBox.setMargin(headerView, new Insets(8, 16, 8, 16));
-        layout.getChildren().add(headerView);
-        layout.getChildren().add(buildingView);
 
-        var scene = new Scene(layout, 640, 660);
-
-        stage.setScene(scene);
-        stage.setOnCloseRequest(this::onApplicationClose);
-        stage.show();
+        rootLayout.getChildren().add(headerView);
+        rootLayout.getChildren().add(buildingView);
     }
 
-    private void establishConnection() {
-        try {
-            IElevator elevatorApi = (IElevator) Naming.lookup("rmi://localhost/ElevatorSim");
-            controlCenter = new ElevatorControlCenter(elevatorApi);
-        } catch (MalformedURLException | NotBoundException | RemoteException e) {
-            //retry
-            //TODO window not yet visible: show error message
-            establishConnection();
-        }
+    private void startPolling() {
+        executorService.scheduleAtFixedRate(controlCenter, 0, 1, TimeUnit.SECONDS);
     }
 
     private List<ElevatorView> initElevatorViews(ViewModelProvider viewModelProvider) {
@@ -97,7 +121,9 @@ public class App extends Application {
     }
 
     private void onApplicationClose(WindowEvent windowEvent) {
-        executorService.shutdown();
+        if (null != executorService) {
+            executorService.shutdown();
+        }
     }
 
     public static void main(String[] args) {
