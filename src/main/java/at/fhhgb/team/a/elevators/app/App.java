@@ -17,7 +17,6 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import sqelevator.IElevator;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -31,9 +30,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class App extends Application {
 
-    private IElevatorSystem controlCenter;
     private final ScheduledExecutorService executorService;
+
+    private IElevatorSystem controlCenter;
     private VBox rootLayout;
+    private ViewModelProvider viewModelProvider;
 
     public App() {
         executorService = Executors.newScheduledThreadPool(1);
@@ -67,8 +68,8 @@ public class App extends Application {
         stage.show();
 
         if (null == controlCenter) {
-            ElevatorSystemFactory eccFactory = new ElevatorSystemFactory();
-            controlCenter = eccFactory.getElevatorSystem("RMI", "rmi://localhost/ElevatorSim", this::establishConnection);
+            ElevatorSystemFactory eccFactory = new ElevatorSystemFactory(this::establishConnection, this::lostConnection);
+            controlCenter = eccFactory.getElevatorSystem("RMI", "rmi://localhost/ElevatorSim");
         }
     }
 
@@ -77,7 +78,7 @@ public class App extends Application {
 
         Building building = controlCenter.getBuilding();
         ViewModelFactory viewModelFactory = new ViewModelFactory(building);
-        ViewModelProvider viewModelProvider = new ViewModelProvider(viewModelFactory);
+        viewModelProvider = new ViewModelProvider(viewModelFactory);
 
         var modeViewModel = viewModelProvider.getModeViewModel();
         var headerView = new HeaderView(modeViewModel);
@@ -96,7 +97,15 @@ public class App extends Application {
         rootLayout.getChildren().add(buildingView);
     }
 
-    private void establishConnection(IElevator ignore) {
+    private void lostConnection() {
+        viewModelProvider.getModeViewModel().setConnection(true);
+    }
+
+    private void establishConnection() {
+        if (null != viewModelProvider) {
+            viewModelProvider.getModeViewModel().setConnection(false);
+        }
+
         Platform.runLater(() -> {
             startPolling();
             initECCView();
@@ -124,6 +133,7 @@ public class App extends Application {
     }
 
     private void onApplicationClose(WindowEvent windowEvent) {
+        controlCenter.shutdown();
         if (null != executorService) {
             executorService.shutdown();
         }

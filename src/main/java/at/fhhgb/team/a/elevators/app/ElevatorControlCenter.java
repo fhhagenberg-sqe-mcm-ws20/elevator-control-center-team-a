@@ -1,6 +1,7 @@
 package at.fhhgb.team.a.elevators.app;
 
-import at.fhhgb.team.a.elevators.RMI.ConnectionService;
+import at.fhhgb.team.a.elevators.rmi.ConnectionService;
+import at.fhhgb.team.a.elevators.rmi.RMIConnectionListener;
 import at.fhhgb.team.a.elevators.exceptions.ElevatorSystemException;
 import at.fhhgb.team.a.elevators.model.*;
 import sqelevator.IElevator;
@@ -20,7 +21,12 @@ public class ElevatorControlCenter implements IElevatorSystem {
      * Callback to the App to indicate that the connection is established and
      * the {@link ElevatorControlCenter#building} created.
      */
-    private ConnectionCallback callback;
+    private ConnectedListener connectedCallback;
+
+    /**
+     * Callback to the App to indicate that the connection is lost
+     */
+    private DisconnectedListener disconnectedCallback;
 
     /**
      * Starts the connection process in another thread.
@@ -58,8 +64,11 @@ public class ElevatorControlCenter implements IElevatorSystem {
         lastUpdateTick = -1;
     }
 
-    public ElevatorControlCenter(String connectionURL, ConnectionCallback callback) {
-        this.callback = callback;
+    public ElevatorControlCenter(String connectionURL,
+                                 ConnectedListener connectedCallback,
+                                 DisconnectedListener disconnectedCallback) {
+        this.connectedCallback = connectedCallback;
+        this.disconnectedCallback = disconnectedCallback;
         this.connectionURL = connectionURL;
         waitForConnection(this::connected);
     }
@@ -72,6 +81,7 @@ public class ElevatorControlCenter implements IElevatorSystem {
             }
         } catch (ElevatorSystemException e) {
             connected = false;
+            disconnectedCallback.onConnectionLost();
             waitForConnection(this::reconnected);
         }
     }
@@ -80,6 +90,7 @@ public class ElevatorControlCenter implements IElevatorSystem {
      * Updates the {@link ElevatorControlCenter#building} by polling new values from the API
      * @throws ElevatorSystemException when a connection issue arises
      */
+    @Override
     public void pollElevatorApi() throws ElevatorSystemException {
         long startTick;
         try {
@@ -123,22 +134,29 @@ public class ElevatorControlCenter implements IElevatorSystem {
         }
     }
 
+    @Override
+    public void shutdown() {
+        if (null != executorService) {
+            executorService.shutdown();
+        }
+    }
 
+    @Override
     public Building getBuilding() {
         return this.building;
     }
 
-    private void waitForConnection(ConnectionCallback callback) {
+    private void waitForConnection(RMIConnectionListener callback) {
         executorService = Executors.newScheduledThreadPool(1);
         ConnectionService rmiService = new ConnectionService(connectionURL, callback);
-        executorService.scheduleWithFixedDelay(rmiService, 0, 500, TimeUnit.MILLISECONDS);
+        executorService.scheduleAtFixedRate(rmiService, 0, 100, TimeUnit.MILLISECONDS);
     }
 
     private void reconnected(IElevator elevatorApi) {
         this.elevatorApi = elevatorApi;
         connected = true;
         executorService.shutdown();
-        callback.connectionEstablished(elevatorApi);
+        connectedCallback.onConnectionEstablished();
     }
 
     private void connected(IElevator elevatorApi) {
@@ -154,7 +172,7 @@ public class ElevatorControlCenter implements IElevatorSystem {
                 waitForConnection(this::connected);
             }
         }
-        callback.connectionEstablished(elevatorApi);
+        connectedCallback.onConnectionEstablished();
     }
 
     private void updateBuilding(List<Floor> floors, List<Elevator> elevators) throws RemoteException {

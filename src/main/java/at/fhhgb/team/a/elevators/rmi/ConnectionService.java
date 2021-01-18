@@ -1,6 +1,5 @@
-package at.fhhgb.team.a.elevators.RMI;
+package at.fhhgb.team.a.elevators.rmi;
 
-import at.fhhgb.team.a.elevators.app.ConnectionCallback;
 import sqelevator.IElevator;
 
 import java.net.MalformedURLException;
@@ -11,11 +10,9 @@ import java.rmi.RemoteException;
 public class ConnectionService implements Runnable {
 
     private final String connectionURL;
-    private final ConnectionCallback callback;
+    private final RMIConnectionListener callback;
 
-    private IElevator elevatorApi;
-
-    public ConnectionService(String connectionURL, ConnectionCallback callback) {
+    public ConnectionService(String connectionURL, RMIConnectionListener callback) {
         this.connectionURL = connectionURL;
         this.callback = callback;
     }
@@ -23,14 +20,16 @@ public class ConnectionService implements Runnable {
     @Override
     public void run() {
         connect();
-        callback.connectionEstablished(elevatorApi);
     }
 
     private void connect() {
+        IElevator elevatorApi;
         try {
             elevatorApi = (IElevator) Naming.lookup(connectionURL);
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
-            connect();
+            // The connection to the system failed
+            return;
         }
+        callback.onRMIConnected(elevatorApi);
     }
 }
