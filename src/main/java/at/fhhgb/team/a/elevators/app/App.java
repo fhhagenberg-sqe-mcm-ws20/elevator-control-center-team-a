@@ -97,11 +97,11 @@ public class App extends Application {
         rootLayout.getChildren().add(buildingView);
     }
 
-    private void lostConnection() {
+    void lostConnection() {
         viewModelProvider.getModeViewModel().setConnection(true);
     }
 
-    private void establishConnection() {
+    void establishConnection() {
         if (null != viewModelProvider) {
             viewModelProvider.getModeViewModel().setConnection(false);
         }

@@ -1,34 +1,39 @@
 package at.fhhgb.team.a.elevators.app;
 
 import at.fhhgb.team.a.elevators.exceptions.ElevatorSystemException;
-import sqelevator.IElevator;
 import at.fhhgb.team.a.elevators.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import sqelevator.IElevator;
 
 import java.rmi.RemoteException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyInt;
 
 @DisplayName("For any ElevatorControlCenter instance")
 class ElevatorControlCenterTest {
 
+    IElevator elevatorApi;
+    ElevatorControlCenter controlCenter;
+    ConnectedListener connectedListener;
+    DisconnectedListener disconnectedListener;
+
+    @BeforeEach
+    void setUp() {
+        elevatorApi = Mockito.mock(IElevator.class);
+        connectedListener = Mockito.mock(ConnectedListener.class);
+        disconnectedListener = Mockito.mock(DisconnectedListener.class);
+        controlCenter = new ElevatorControlCenter(elevatorApi, connectedListener, disconnectedListener);
+    }
+
     @Nested
     @DisplayName("assert that pollElevatorApi")
-    class PollElevatorApi {
-
-        IElevator elevatorApi;
-        ElevatorControlCenter controlCenter;
-
-        @BeforeEach
-        void setUp() {
-            elevatorApi = Mockito.mock(IElevator.class);
-            controlCenter = new ElevatorControlCenter(elevatorApi);
-        }
+    class TestPollElevatorApi {
 
         @Test
         @DisplayName("creates a building with the correct number of Floors")
@@ -270,6 +275,31 @@ class ElevatorControlCenterTest {
 
             assertThat(target.getNumber()).isEqualTo(targetFloorNumber);
             assertThat(downButtonPressed).isEqualTo(downButtonPressedOnTargetFloor);
+        }
+
+        @Test
+        @DisplayName("throws Exception when connection gets lost.")
+        void testConnectionException() throws RemoteException {
+            Mockito.when(elevatorApi.getClockTick()).thenThrow(new RemoteException(""));
+
+            assertThatThrownBy(() -> controlCenter.pollElevatorApi())
+                    .isInstanceOf(ElevatorSystemException.class)
+                    .hasMessage("Failed to poll clock tick.");
+        }
+    }
+
+    @Nested
+    @DisplayName("assert that run")
+    class TestRun {
+
+        @Test
+        @DisplayName("notifies when connection breaks.")
+        void testReconnectingAfterConnectionLost() throws RemoteException {
+            Mockito.when(elevatorApi.getClockTick()).thenThrow(new RemoteException(""));
+
+            controlCenter.run();
+
+            Mockito.verify(disconnectedListener, Mockito.times(1)).onConnectionLost();
         }
     }
 }

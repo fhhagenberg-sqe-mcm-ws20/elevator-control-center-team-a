@@ -58,7 +58,11 @@ public class ElevatorControlCenter implements IElevatorSystem {
      */
     private long lastUpdateTick;
 
-    public ElevatorControlCenter(IElevator elevatorApi) {
+    public ElevatorControlCenter(IElevator elevatorApi,
+                                 ConnectedListener connectedCallback,
+                                 DisconnectedListener disconnectedCallback) {
+        this.connectedCallback = connectedCallback;
+        this.disconnectedCallback = disconnectedCallback;
         this.elevatorApi = elevatorApi;
         connected = true;
         lastUpdateTick = -1;
@@ -109,11 +113,12 @@ public class ElevatorControlCenter implements IElevatorSystem {
         try {
             floors = createFloors();
             elevators = createElevators(floors);
+            addFloorServiceAssignments(elevators, floors);
         } catch (RemoteException e) {
             throw new ElevatorSystemException("Failed to poll floors and elevators.", e);
         }
 
-        addFloorServiceAssignments(elevators, floors);
+
         long endTick;
         try {
             endTick = elevatorApi.getClockTick();
@@ -232,7 +237,6 @@ public class ElevatorControlCenter implements IElevatorSystem {
 
             if (elevator != null) {
                 updateElevator(floors, elevator.getNumber());
-                elevator.addObserver(this::update);
             }
         }
     }
@@ -324,6 +328,7 @@ public class ElevatorControlCenter implements IElevatorSystem {
         elevator.setDoorStatus(DoorStatus.fromNumber(elevatorDoorStatus));
         elevator.setTarget(targetFloor.get());
         elevator.setCurrentPosition(currentPosition);
+        elevator.addObserver(this::update);
         return elevator;
     }
 
@@ -351,30 +356,22 @@ public class ElevatorControlCenter implements IElevatorSystem {
         return floors;
     }
 
-    private void addFloorServiceAssignments(List<Elevator> elevators, List<Floor> floors){
-        floors.stream().forEach(f -> {
-            elevators.stream().forEach(e -> {
-                try {
-                    boolean serviced = elevatorApi.getServicesFloors(e.getNumber(), f.getNumber());
-                    if(serviced) {
-                        boolean pressed = elevatorApi.getElevatorButton(e.getNumber(), f.getNumber());
-                        e.addFloorService(f, pressed);
-                    }
-                } catch (RemoteException ex) {
-                    System.out.println("Floor service assignment not possible");
+    private void addFloorServiceAssignments(List<Elevator> elevators, List<Floor> floors) throws RemoteException {
+        for (Floor f : floors) {
+            for (Elevator e : elevators) {
+                boolean serviced = elevatorApi.getServicesFloors(e.getNumber(), f.getNumber());
+                if(serviced) {
+                    boolean pressed = elevatorApi.getElevatorButton(e.getNumber(), f.getNumber());
+                    e.addFloorService(f, pressed);
                 }
-            });
-        });
+            }
+        }
     }
 
-    private void updateElevatorButtons(Elevator elevator) {
-        elevator.getFloors().stream().forEach(floor -> {
-            try {
-                boolean isPressed = elevatorApi.getElevatorButton(elevator.getNumber(), floor.getNumber());
-                elevator.setFloorButton(floor, isPressed);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        });
+    private void updateElevatorButtons(Elevator elevator) throws RemoteException {
+        for (Floor floor : elevator.getFloors()) {
+            boolean isPressed = elevatorApi.getElevatorButton(elevator.getNumber(), floor.getNumber());
+            elevator.setFloorButton(floor, isPressed);
+        }
     }
 }
