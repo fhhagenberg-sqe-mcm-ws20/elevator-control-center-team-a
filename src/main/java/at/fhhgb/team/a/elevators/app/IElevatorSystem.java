@@ -7,7 +7,5 @@ public interface IElevatorSystem extends Runnable {
 
     void pollElevatorApi() throws ElevatorSystemException;
 
-    void shutdown();
-
     Building getBuilding();
 }

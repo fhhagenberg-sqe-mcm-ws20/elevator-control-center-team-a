@@ -4,6 +4,7 @@ import at.fhhgb.team.a.elevators.factory.ElevatorSystemFactory;
 import at.fhhgb.team.a.elevators.factory.ViewModelFactory;
 import at.fhhgb.team.a.elevators.model.Building;
 import at.fhhgb.team.a.elevators.provider.ViewModelProvider;
+import at.fhhgb.team.a.elevators.threading.ThreadManager;
 import at.fhhgb.team.a.elevators.view.*;
 import at.fhhgb.team.a.elevators.viewmodels.ElevatorViewModel;
 import javafx.application.Application;
@@ -21,27 +22,19 @@ import javafx.stage.WindowEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * JavaFX App
  */
 public class App extends Application {
 
-    private final ScheduledExecutorService executorService;
-
     private IElevatorSystem controlCenter;
     private VBox rootLayout;
     private ViewModelProvider viewModelProvider;
 
-    public App() {
-        executorService = Executors.newScheduledThreadPool(1);
-    }
+    public App() { }
 
     public App(IElevatorSystem controlCenter) {
-        this();
         this.controlCenter = controlCenter;
     }
 
@@ -117,7 +110,7 @@ public class App extends Application {
     }
 
     private void startPolling() {
-        executorService.scheduleAtFixedRate(controlCenter, 0, 1, TimeUnit.SECONDS);
+        ThreadManager.getInstance().scheduleRunnable(controlCenter, 1000);
     }
 
     private List<ElevatorView> initElevatorViews(ViewModelProvider viewModelProvider) {
@@ -133,9 +126,6 @@ public class App extends Application {
     }
 
     private void onApplicationClose(WindowEvent windowEvent) {
-        controlCenter.shutdown();
-        if (null != executorService) {
-            executorService.shutdown();
-        }
+        ThreadManager.getInstance().stopCurrentTasks();
     }
 }

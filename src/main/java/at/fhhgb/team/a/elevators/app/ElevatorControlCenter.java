@@ -1,9 +1,10 @@
 package at.fhhgb.team.a.elevators.app;
 
-import at.fhhgb.team.a.elevators.rmi.ConnectionService;
-import at.fhhgb.team.a.elevators.rmi.RMIConnectionListener;
 import at.fhhgb.team.a.elevators.exceptions.ElevatorSystemException;
 import at.fhhgb.team.a.elevators.model.*;
+import at.fhhgb.team.a.elevators.rmi.ConnectionService;
+import at.fhhgb.team.a.elevators.rmi.RMIConnectionListener;
+import at.fhhgb.team.a.elevators.threading.ThreadManager;
 import sqelevator.IElevator;
 
 import java.rmi.RemoteException;
@@ -11,9 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class ElevatorControlCenter implements IElevatorSystem {
 
@@ -21,27 +19,22 @@ public class ElevatorControlCenter implements IElevatorSystem {
      * Callback to the App to indicate that the connection is established and
      * the {@link ElevatorControlCenter#building} created.
      */
-    private ConnectedListener connectedCallback;
+    private final ConnectedListener connectedCallback;
 
     /**
      * Callback to the App to indicate that the connection is lost
      */
-    private DisconnectedListener disconnectedCallback;
-
-    /**
-     * Starts the connection process in another thread.
-     */
-    private ScheduledExecutorService executorService;
-
-    /**
-     * Flag to not poll the API until a connection is established
-     */
-    private boolean connected = false;
+    private final DisconnectedListener disconnectedCallback;
 
     /**
      * RMI URL endpoint
      */
-    private String connectionURL = "";
+    private final String connectionURL;
+
+    /**
+     * Flag to not poll the API until a connection is established
+     */
+    private boolean connected;
 
     /**
      * Elevator that is controlled by this center
@@ -64,6 +57,7 @@ public class ElevatorControlCenter implements IElevatorSystem {
         this.connectedCallback = connectedCallback;
         this.disconnectedCallback = disconnectedCallback;
         this.elevatorApi = elevatorApi;
+        connectionURL = "";
         connected = true;
         lastUpdateTick = -1;
     }
@@ -74,6 +68,7 @@ public class ElevatorControlCenter implements IElevatorSystem {
         this.connectedCallback = connectedCallback;
         this.disconnectedCallback = disconnectedCallback;
         this.connectionURL = connectionURL;
+        connected = false;
         waitForConnection(this::connected);
     }
 
@@ -140,34 +135,26 @@ public class ElevatorControlCenter implements IElevatorSystem {
     }
 
     @Override
-    public void shutdown() {
-        if (null != executorService) {
-            executorService.shutdown();
-        }
-    }
-
-    @Override
     public Building getBuilding() {
         return this.building;
     }
 
     private void waitForConnection(RMIConnectionListener callback) {
-        executorService = Executors.newScheduledThreadPool(1);
         ConnectionService rmiService = new ConnectionService(connectionURL, callback);
-        executorService.scheduleAtFixedRate(rmiService, 0, 100, TimeUnit.MILLISECONDS);
+        ThreadManager.getInstance().scheduleRunnable(rmiService, 100);
     }
 
     private void reconnected(IElevator elevatorApi) {
         this.elevatorApi = elevatorApi;
         connected = true;
-        executorService.shutdown();
+        ThreadManager.getInstance().stopCurrentTasks();
         connectedCallback.onConnectionEstablished();
     }
 
     private void connected(IElevator elevatorApi) {
         this.elevatorApi = elevatorApi;
         connected = true;
-        executorService.shutdown();
+        ThreadManager.getInstance().stopCurrentTasks();
 
         while (null == building) {
             try {
