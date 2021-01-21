@@ -23,6 +23,7 @@ public class AutoModeExecutorTest {
         building = Mockito.mock(Building.class);
 
         elevator = Mockito.mock(Elevator.class);
+        Mockito.when(elevator.getDoorStatus()).thenReturn(DoorStatus.open);
         var elevators = new ArrayList<Elevator>();
         elevators.add(elevator);
         Mockito.when(building.getElevators()).thenReturn(elevators);
