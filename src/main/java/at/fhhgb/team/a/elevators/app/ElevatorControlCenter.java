@@ -364,4 +364,8 @@ public class ElevatorControlCenter implements IElevatorSystem {
     public void setEccMode(ECCMode eccMode) {
         this.eccMode = eccMode;
     }
+
+    public ECCMode getEccMode() {
+        return eccMode;
+    }
 }

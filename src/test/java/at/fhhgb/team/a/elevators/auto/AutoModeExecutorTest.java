@@ -8,7 +8,7 @@ import org.mockito.Mockito;
 import java.util.ArrayList;
 
 
-public class AutoModeExecutorTest {
+class AutoModeExecutorTest {
     AutoModeExecutor autoModeExecutor;
     Building building;
     Elevator elevator;
