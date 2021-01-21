@@ -1,9 +1,6 @@
 package at.fhhgb.team.a.elevators.auto;
 
-import at.fhhgb.team.a.elevators.model.Building;
-import at.fhhgb.team.a.elevators.model.Direction;
-import at.fhhgb.team.a.elevators.model.Elevator;
-import at.fhhgb.team.a.elevators.model.Floor;
+import at.fhhgb.team.a.elevators.model.*;
 
 import java.util.Comparator;
 import java.util.List;
@@ -24,9 +21,10 @@ public class AutoModeExecutor implements EccModeExecutor {
     private void setNewTarget(Elevator elevator) {
         var currentFloor = elevator.getCurrentPosition().getClosestFloor();
         var targetFloor = elevator.getTarget();
+        var doorStatus = elevator.getDoorStatus();
 
-        if(currentFloor != targetFloor) {
-            // elevator still moving
+        if(currentFloor != targetFloor || doorStatus != DoorStatus.open) {
+            // elevator still moving or door not open yet
             return;
         }
 
@@ -43,7 +41,7 @@ public class AutoModeExecutor implements EccModeExecutor {
             // in between -> continue last committed direction
             if(elevator.getCommittedDirection() == Direction.up) {
                 setTargetToNextAvailableFloorUp(elevator, currentFloor.getNumber());
-            } else if (elevator.getCommittedDirection() == Direction.down) {
+            } else {
                 setTargetToNextAvailableFloorDown(elevator, currentFloor.getNumber());
             }
         }

@@ -79,6 +79,7 @@ public class ElevatorControlCenter implements IElevatorSystem {
         try {
             if (connected) {
                 pollElevatorApi();
+                eccMode.getEccModeExecutor().execute(building);
             }
         } catch (ElevatorSystemException e) {
             connected = false;
@@ -161,7 +162,6 @@ public class ElevatorControlCenter implements IElevatorSystem {
         while (null == building) {
             try {
                 pollElevatorApi();
-                eccMode.getEccModeExecutor().execute(building);
             } catch (ElevatorSystemException e) {
                 connected = false;
                 waitForConnection(this::connected);

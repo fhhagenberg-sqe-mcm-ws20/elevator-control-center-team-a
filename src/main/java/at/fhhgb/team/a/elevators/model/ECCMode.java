@@ -16,6 +16,7 @@ public class ECCMode {
 
     public ECCMode() {
         automaticModeEnabled = true;
+        executor = new AutoModeExecutor();
     }
 
     public boolean isAutomaticModeEnabled() {
@@ -25,10 +26,10 @@ public class ECCMode {
     public void modeButtonPressed() {
         if (automaticModeEnabled) {
             automaticModeEnabled = false;
-            executor = new AutoModeExecutor();
+            executor = new ManualModeExecutor();
         } else {
             automaticModeEnabled = true;
-            executor = new ManualModeExecutor();
+            executor = new AutoModeExecutor();
         }
     }
 
