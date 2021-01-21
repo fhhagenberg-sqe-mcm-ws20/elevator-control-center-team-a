@@ -49,7 +49,7 @@ public class ElevatorFloorViewModel {
         String titleString = String.valueOf(floor.getNumber());
         title = new SimpleStringProperty(titleString);
 
-        Paint color = elevator.getElevatorButton(floor.getNumber()) ? Color.GREEN : Color.BLACK;
+        Paint color = getTitleFillColorFor(elevator, floor);
         titleFill = new SimpleObjectProperty<>(color);
 
         Background background = getBackgroundFor(elevator, floor);
@@ -98,7 +98,13 @@ public class ElevatorFloorViewModel {
         return new Background(backgroundFill);
     }
 
+    private Color getTitleFillColorFor(Elevator elevator, Floor floor) {
+        return elevator.getElevatorButton(floor.getNumber()) ? Color.GREEN : Color.BLACK;
+    }
+
     private void update(Observable o, Object arg) {
         onTargetFloorChanged();
+        titleFill.setValue(getTitleFillColorFor(elevator, floor));
+
     }
 }

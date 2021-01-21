@@ -40,8 +40,6 @@ public class FloorsView extends VBox {
             stackButtonUp.setPadding(new Insets(4));
             stackButtonUp.idProperty().bind(floorViewModel.getUpButtonId());
             stackButtonUp.backgroundProperty().bind(floorViewModel.getUpButtonBackground());
-            FloorUpButtonClickEvent eventUp = new FloorUpButtonClickEvent(floorViewModel);
-            stackButtonUp.setOnMouseClicked(eventUp::onClicked);
             hbox.getChildren().add(stackButtonUp);
 
             var downButtonImageView = new ImageView("images/down-chevron.png");
@@ -52,8 +50,6 @@ public class FloorsView extends VBox {
             stackButtonDown.setPadding(new Insets(4));
             stackButtonDown.idProperty().bind(floorViewModel.getDownButtonId());
             stackButtonDown.backgroundProperty().bind(floorViewModel.getDownButtonBackground());
-            FloorDownButtonClickEvent eventDown = new FloorDownButtonClickEvent(floorViewModel);
-            stackButtonDown.setOnMouseClicked(eventDown::onClicked);
             hbox.getChildren().add(stackButtonDown);
 
             hbox.setSpacing(8);
@@ -62,29 +58,5 @@ public class FloorsView extends VBox {
 
             this.getChildren().add(hbox);
         }
-    }
-}
-
-class FloorDownButtonClickEvent extends ActionEvent {
-    private final FloorViewModel floorViewModel;
-
-    public FloorDownButtonClickEvent(FloorViewModel floorViewModel) {
-        this.floorViewModel = floorViewModel;
-    }
-
-    public void onClicked(MouseEvent event) {
-        floorViewModel.onFloorDownButtonPressed();
-    }
-}
-
-class FloorUpButtonClickEvent extends ActionEvent {
-    private final FloorViewModel floorViewModel;
-
-    public FloorUpButtonClickEvent(FloorViewModel floorViewModel) {
-        this.floorViewModel = floorViewModel;
-    }
-
-    public void onClicked(MouseEvent event) {
-        floorViewModel.onFloorUpButtonPressed();
     }
 }

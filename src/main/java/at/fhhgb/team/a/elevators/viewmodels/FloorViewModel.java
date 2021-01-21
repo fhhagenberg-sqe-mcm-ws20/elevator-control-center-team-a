@@ -1,6 +1,5 @@
 package at.fhhgb.team.a.elevators.viewmodels;
 
-import at.fhhgb.team.a.elevators.model.ECCMode;
 import at.fhhgb.team.a.elevators.model.Floor;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -16,21 +15,19 @@ import java.util.Observable;
 
 public class FloorViewModel {
 
-    private Floor floor;
-    private final ECCMode eccMode;
+    private final Floor floor;
 
     private final BackgroundFill pressedBackgroundFill;
     private final BackgroundFill notPressedBackgroundFill;
 
     private final StringProperty downButtonId;
     private final StringProperty upButtonId;
-    private StringProperty title;
-    private ObjectProperty<Background> downButtonBackground;
-    private ObjectProperty<Background> upButtonBackground;
+    private final StringProperty title;
+    private final ObjectProperty<Background> downButtonBackground;
+    private final ObjectProperty<Background> upButtonBackground;
 
-    public FloorViewModel(Floor floor, ECCMode eccMode) {
+    public FloorViewModel(Floor floor) {
         this.floor = floor;
-        this.eccMode = eccMode;
 
         this.floor.addObserver(this::update);
 
@@ -52,24 +49,6 @@ public class FloorViewModel {
 
         Background backgroundUp = getBackgroundUpButton();
         upButtonBackground = new SimpleObjectProperty<>(backgroundUp);
-    }
-
-    public void onFloorDownButtonPressed() {
-        if(!eccMode.isAutomaticModeEnabled()) {
-            floor.pressDownButton();
-
-            Background backgroundDown = getBackgroundDownButton();
-            downButtonBackground.setValue(backgroundDown);
-        }
-    }
-
-    public void onFloorUpButtonPressed() {
-        if(!eccMode.isAutomaticModeEnabled()) {
-            floor.pressUpButton();
-
-            Background backgroundUp = getBackgroundUpButton();
-            upButtonBackground.setValue(backgroundUp);
-        }
     }
 
     public Floor getFloor() {
@@ -112,9 +91,9 @@ public class FloorViewModel {
 
     private void update(Observable o, Object arg) {
         Background backgroundDown = getBackgroundDownButton();
-        downButtonBackground = new SimpleObjectProperty<>(backgroundDown);
+        downButtonBackground.setValue(backgroundDown);
 
         Background backgroundUp = getBackgroundUpButton();
-        upButtonBackground = new SimpleObjectProperty<>(backgroundUp);
+        upButtonBackground.setValue(backgroundUp);
     }
 }
