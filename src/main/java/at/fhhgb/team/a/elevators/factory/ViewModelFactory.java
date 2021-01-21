@@ -19,9 +19,9 @@ public class ViewModelFactory {
     private final Building building;
     private final ECCMode eccMode;
 
-    public ViewModelFactory(Building building) {
+    public ViewModelFactory(Building building, ECCMode eccMode) {
         this.building = building;
-        eccMode = new ECCMode();
+        this.eccMode = eccMode;
     }
 
     public ModeViewModel createModeViewModel() {

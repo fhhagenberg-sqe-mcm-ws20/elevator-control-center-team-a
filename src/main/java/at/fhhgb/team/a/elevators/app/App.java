@@ -3,6 +3,7 @@ package at.fhhgb.team.a.elevators.app;
 import at.fhhgb.team.a.elevators.factory.ElevatorSystemFactory;
 import at.fhhgb.team.a.elevators.factory.ViewModelFactory;
 import at.fhhgb.team.a.elevators.model.Building;
+import at.fhhgb.team.a.elevators.model.ECCMode;
 import at.fhhgb.team.a.elevators.provider.ViewModelProvider;
 import at.fhhgb.team.a.elevators.threading.ThreadManager;
 import at.fhhgb.team.a.elevators.view.*;
@@ -70,7 +71,9 @@ public class App extends Application {
         hideWaitingMessage();
 
         Building building = controlCenter.getBuilding();
-        ViewModelFactory viewModelFactory = new ViewModelFactory(building);
+        ECCMode eccMode = new ECCMode();
+        controlCenter.setEccMode(eccMode);
+        ViewModelFactory viewModelFactory = new ViewModelFactory(building, eccMode);
         viewModelProvider = new ViewModelProvider(viewModelFactory);
 
         var modeViewModel = viewModelProvider.getModeViewModel();
