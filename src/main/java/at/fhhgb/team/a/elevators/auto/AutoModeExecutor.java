@@ -3,19 +3,13 @@ package at.fhhgb.team.a.elevators.auto;
 import at.fhhgb.team.a.elevators.model.*;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 public class AutoModeExecutor implements EccModeExecutor {
     @Override
     public void execute(Building building) {
-        building.getElevators().forEach(elevator -> {
-            setNewTarget(elevator);
-        });
+        building.getElevators().forEach(this::setNewTarget);
     }
 
     private void setNewTarget(Elevator elevator) {
@@ -28,8 +22,8 @@ public class AutoModeExecutor implements EccModeExecutor {
             return;
         }
 
-        int minimumFloorNumber = elevator.getFloors().stream().mapToInt(f -> f.getNumber()).min().orElse(currentFloor.getNumber());
-        int maximumFloorNumber = elevator.getFloors().stream().mapToInt(f -> f.getNumber()).max().orElse(currentFloor.getNumber());
+        int minimumFloorNumber = elevator.getFloors().stream().mapToInt(Floor::getNumber).min().orElse(currentFloor.getNumber());
+        int maximumFloorNumber = elevator.getFloors().stream().mapToInt(Floor::getNumber).max().orElse(currentFloor.getNumber());
 
         if(currentFloor.getNumber() == minimumFloorNumber) {
             // lowest floor -> go up
