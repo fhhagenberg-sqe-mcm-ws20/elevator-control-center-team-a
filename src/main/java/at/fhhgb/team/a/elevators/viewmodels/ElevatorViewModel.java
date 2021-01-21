@@ -9,9 +9,8 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
 
 import java.util.Observable;
-import java.util.Observer;
 
-public class ElevatorViewModel implements Observer {
+public class ElevatorViewModel {
 
     private final Elevator elevator;
     private final ECCMode eccMode;
@@ -28,7 +27,7 @@ public class ElevatorViewModel implements Observer {
         this.elevator = elevator;
         this.eccMode = eccMode;
 
-        this.elevator.addObserver(this);
+        this.elevator.addObserver(this::update);
 
         String idString = "e" + elevator.getNumber();
         id = new SimpleStringProperty(idString);
@@ -95,7 +94,6 @@ public class ElevatorViewModel implements Observer {
         return elevator.getNumber();
     }
 
-    @Override
     public void update(Observable o, Object arg) {
         String idString = "e" + elevator.getNumber();
         id.setValue(idString);

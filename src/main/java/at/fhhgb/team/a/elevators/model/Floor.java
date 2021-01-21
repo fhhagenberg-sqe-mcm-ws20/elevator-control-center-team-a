@@ -54,16 +54,30 @@ public class Floor extends Observable {
     }
 
     /**
-     * Sets the status of the Down button on the floor to the opposite (on/off).
+     * Sets the status of the Down button on the floor to on.
      */
     public void pressDownButton() {
         downButton.press();
+        setChanged();
+        notifyObservers();
     }
 
     /**
-     * Sets the status of the Up button on the floor to the opposite (on/off).
+     * Sets the status of the Up button on the floor to on.
      */
     public void pressUpButton() {
         upButton.press();
+        setChanged();
+        notifyObservers();
+    }
+
+    /**
+     * Clears the state of the Down & Up buttons on the floor
+     */
+    public void clearButtonState() {
+        downButton.clear();
+        upButton.clear();
+        setChanged();
+        notifyObservers();
     }
 }

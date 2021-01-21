@@ -1,36 +1,37 @@
 package at.fhhgb.team.a.elevators.app;
 
-import at.fhhgb.team.a.elevators.model.*;
-import javafx.scene.Node;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
+import at.fhhgb.team.a.elevators.exceptions.ElevatorSystemException;
+import at.fhhgb.team.a.elevators.model.Direction;
+import at.fhhgb.team.a.elevators.model.DoorStatus;
+import at.fhhgb.team.a.elevators.model.Elevator;
+import at.fhhgb.team.a.elevators.model.Floor;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
-import org.testfx.service.query.NodeQuery;
 import sqelevator.IElevator;
 
-import java.awt.*;
-import java.net.MalformedURLException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.times;
 import static org.testfx.api.FxAssert.verifyThat;
 import static org.testfx.util.NodeQueryUtils.hasText;
 import static org.testfx.util.NodeQueryUtils.isVisible;
 
 @ExtendWith(ApplicationExtension.class)
-public class AppTest {
+class AppTest {
+
+    App app;
     IElevator elevatorApi;
     ElevatorControlCenter controlCenter;
+    ConnectedListener connectedListener;
+    DisconnectedListener disconnectedListener;
 
     /**
      * Will be called with {@code @Before} semantics, i. e. before each test method.
@@ -38,14 +39,18 @@ public class AppTest {
      * @param stage - Will be injected by the test runner.
      */
     @Start
-    public void start(Stage stage) throws RemoteException, MalformedURLException, NotBoundException {
+    public void start(Stage stage) throws RemoteException, ElevatorSystemException {
         elevatorApi = Mockito.mock(IElevator.class);
-        controlCenter = new ElevatorControlCenter(elevatorApi);
+        connectedListener = Mockito.mock(ConnectedListener.class);
+        disconnectedListener = Mockito.mock(DisconnectedListener.class);
+        controlCenter = new ElevatorControlCenter(elevatorApi, connectedListener, disconnectedListener);
 
         setupMockup();
 
-        var app = new App(controlCenter);
+        controlCenter.pollElevatorApi();
+        app = new App(controlCenter);
         app.start(stage);
+        app.initECCView();
     }
 
     private void setupMockup() throws RemoteException {
@@ -77,7 +82,7 @@ public class AppTest {
     }
 
     @Test
-    void testElevatorFloorButtonClick(FxRobot robot) throws RemoteException {
+    void testElevatorFloorButtonClick(FxRobot robot) throws ElevatorSystemException, RemoteException {
         Elevator elevator = controlCenter.getBuilding().getElevator(0);
         
         // Assert that the default target number is set
@@ -105,40 +110,12 @@ public class AppTest {
 
         Floor target = elevator.getTarget();
         assertThat(target.getNumber()).isEqualTo(2);
+
+        Mockito.verify(elevatorApi, times(1)).setTarget(0, 2);
     }
 
     @Test
-    void testFloorButtonsPressed(FxRobot robot) throws RemoteException {
-        Floor floor = controlCenter.getBuilding().getFloor(1);
-        assertThat(floor.isUpButtonOn()).isFalse();
-
-        // Go into manual mode
-        verifyThat("#modeButton", isVisible());
-        verifyThat("#modeButton", hasText("Auto"));
-
-        robot.clickOn("#modeButton");
-
-        verifyThat("#modeButton", isVisible());
-        verifyThat("#modeButton", hasText("Manual"));
-
-        // Click on floor buttons
-        verifyThat("#f1-up", isVisible());
-        robot.clickOn("#f1-up");
-
-        verifyThat("#f1-down", isVisible());
-        robot.clickOn("#f1-down");
-
-        // Assert that the API call has been executed
-        controlCenter.pollElevatorApi();
-        floor = controlCenter.getBuilding().getFloor(1);
-
-        assertThat(floor.isUpButtonOn()).isTrue();
-        assertThat(floor.isDownButtonOn()).isTrue();
-    }
-
-
-    @Test
-    void testElevatorSpeedChange(FxRobot robot) throws RemoteException {
+    void testElevatorSpeedChange(FxRobot robot) throws RemoteException, ElevatorSystemException {
         // Assert that the GUI shows the default values
         verifyThat("#e0-speed", isVisible());
         verifyThat("#e0-speed", hasText("speed: 10.0 km/h"));
@@ -151,5 +128,25 @@ public class AppTest {
         // Assert that the GUI shows the updated values
         verifyThat("#e0-speed", isVisible());
         verifyThat("#e0-speed", hasText("speed: 12.0 km/h"));
+    }
+
+    @Test
+    void testConnectionWarning(FxRobot robot) {
+        HBox warningLayout = robot.lookup("#warning_message").queryAs(HBox.class);
+        assertThat(warningLayout.isVisible()).isFalse();
+
+        app.lostConnection();
+
+        assertThat(warningLayout.isVisible()).isTrue();
+    }
+
+    @Test
+    void testReconnection(FxRobot robot) {
+        HBox warningLayout = robot.lookup("#warning_message").queryAs(HBox.class);
+
+        app.lostConnection();
+        app.establishConnection();
+
+        assertThat(warningLayout.isVisible()).isFalse();
     }
 }

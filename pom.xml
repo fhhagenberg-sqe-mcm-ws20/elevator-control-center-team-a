@@ -87,6 +87,17 @@
                     <launcher>launcher</launcher>
                     <mainClass>at.fhhgb.team.a.elevators.app.App</mainClass>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>debug</id>
+                        <configuration>
+                            <mainClass>at.fhhgb.team.a.elevators.app.App</mainClass>
+                            <options>
+                                <option>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:8000</option>
+                            </options>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
