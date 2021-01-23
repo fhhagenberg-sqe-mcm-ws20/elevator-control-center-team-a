@@ -97,7 +97,6 @@ class ElevatorControlCenterTest {
             Mockito.when(elevatorApi.getClockTick()).thenReturn(1L);
             Mockito.when(elevatorApi.getFloorNum()).thenReturn(1);
             Mockito.when(elevatorApi.getElevatorNum()).thenReturn(1);
-            Mockito.when(elevatorApi.getCommittedDirection(anyInt())).thenReturn(direction.number);
             Mockito.when(elevatorApi.getElevatorAccel(anyInt())).thenReturn(acceleration);
             Mockito.when(elevatorApi.getElevatorCapacity(anyInt())).thenReturn(capacity);
             Mockito.when(elevatorApi.getElevatorDoorStatus(anyInt())).thenReturn(doorStatus.number);
@@ -114,7 +113,6 @@ class ElevatorControlCenterTest {
             assertThat(firstElevator.getSpeed()).isEqualTo(speed);
             assertThat(firstElevator.getAcceleration()).isEqualTo(acceleration);
             assertThat(firstElevator.getDoorStatus()).isEqualTo(doorStatus);
-            assertThat(firstElevator.getCommittedDirection()).isEqualTo(direction);
             assertThat(firstElevator.getWeight()).isEqualTo(weight);
         }
 

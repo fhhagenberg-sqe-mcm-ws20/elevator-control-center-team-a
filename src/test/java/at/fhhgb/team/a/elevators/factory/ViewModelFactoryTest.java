@@ -1,6 +1,8 @@
 package at.fhhgb.team.a.elevators.factory;
 
+import at.fhhgb.team.a.elevators.auto.EccModeExecutor;
 import at.fhhgb.team.a.elevators.model.Building;
+import at.fhhgb.team.a.elevators.model.ECCMode;
 import at.fhhgb.team.a.elevators.model.Elevator;
 import at.fhhgb.team.a.elevators.model.Floor;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +20,7 @@ class ViewModelFactoryTest {
     @BeforeEach
     void setUp() {
         building = Mockito.mock(Building.class);
-        viewModelFactory = new ViewModelFactory(building);
+        viewModelFactory = new ViewModelFactory(building, new ECCMode());
     }
 
     @Test
