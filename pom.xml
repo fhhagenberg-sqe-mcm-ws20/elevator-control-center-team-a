@@ -2,8 +2,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>at.fhhgb.team.a.elevators</groupId>
-    <artifactId>elevator-control-center</artifactId>
-    <version>0.0.2</version>
+    <artifactId>elevator-control-center-team-a</artifactId>
+    <version>1.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
