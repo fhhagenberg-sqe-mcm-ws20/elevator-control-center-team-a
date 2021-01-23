@@ -60,7 +60,7 @@ class AppTest {
         Mockito.when(elevatorApi.getCommittedDirection(anyInt())).thenReturn(Direction.down.number);
         Mockito.when(elevatorApi.getElevatorAccel(anyInt())).thenReturn(50);
         Mockito.when(elevatorApi.getElevatorCapacity(anyInt())).thenReturn(100);
-        Mockito.when(elevatorApi.getElevatorDoorStatus(anyInt())).thenReturn(DoorStatus.closing.number);
+        Mockito.when(elevatorApi.getElevatorDoorStatus(anyInt())).thenReturn(DoorStatus.open.number);
         Mockito.when(elevatorApi.getElevatorSpeed(anyInt())).thenReturn(10);
         Mockito.when(elevatorApi.getElevatorWeight(anyInt())).thenReturn(500);
         Mockito.when(elevatorApi.getServicesFloors(anyInt(), anyInt())).thenReturn(true);
@@ -148,5 +148,14 @@ class AppTest {
         app.establishConnection();
 
         assertThat(warningLayout.isVisible()).isFalse();
+    }
+
+    @Test
+    void testAutoMode() throws RemoteException {
+        var automaticModeExecutor = controlCenter.getEccMode().getEccModeExecutor();
+        automaticModeExecutor.execute(controlCenter.getBuilding());
+
+        Mockito.verify(elevatorApi, times(1)).setTarget(0, 1);
+        Mockito.verify(elevatorApi, times(1)).setTarget(1, 1);
     }
 }

@@ -51,6 +51,8 @@ public class ElevatorControlCenter implements IElevatorSystem {
      */
     private long lastUpdateTick;
 
+    private ECCMode eccMode;
+
     public ElevatorControlCenter(IElevator elevatorApi,
                                  ConnectedListener connectedCallback,
                                  DisconnectedListener disconnectedCallback) {
@@ -77,6 +79,7 @@ public class ElevatorControlCenter implements IElevatorSystem {
         try {
             if (connected) {
                 pollElevatorApi();
+                eccMode.getEccModeExecutor().execute(building);
             }
         } catch (ElevatorSystemException e) {
             connected = false;
@@ -239,7 +242,6 @@ public class ElevatorControlCenter implements IElevatorSystem {
             return;
         }
 
-        int committedDirection = elevatorApi.getCommittedDirection(elevatorNumber);
         int elevatorAccel = elevatorApi.getElevatorAccel(elevatorNumber);
         int elevatorDoorStatus = elevatorApi.getElevatorDoorStatus(elevatorNumber);
         int elevatorPosition = elevatorApi.getElevatorPosition(elevatorNumber);
@@ -249,7 +251,6 @@ public class ElevatorControlCenter implements IElevatorSystem {
 
         Elevator elevator = building.getElevator(elevatorNumber);
         updateElevatorButtons(elevator);
-        elevator.setCommittedDirection(Direction.fromNumber(committedDirection));
         elevator.setSpeed(elevatorSpeed);
         elevator.setAcceleration(elevatorAccel);
         elevator.setDoorStatus(DoorStatus.fromNumber(elevatorDoorStatus));
@@ -299,7 +300,6 @@ public class ElevatorControlCenter implements IElevatorSystem {
             return null;
         }
 
-        int committedDirection = elevatorApi.getCommittedDirection(elevatorNumber);
         int elevatorAccel = elevatorApi.getElevatorAccel(elevatorNumber);
         int elevatorCapacity = elevatorApi.getElevatorCapacity(elevatorNumber);
         int elevatorDoorStatus = elevatorApi.getElevatorDoorStatus(elevatorNumber);
@@ -309,7 +309,6 @@ public class ElevatorControlCenter implements IElevatorSystem {
         Position currentPosition = new Position(elevatorPosition, closestFloor.get());
 
         Elevator elevator = new Elevator(elevatorNumber, elevatorCapacity, elevatorWeight);
-        elevator.setCommittedDirection(Direction.fromNumber(committedDirection));
         elevator.setSpeed(elevatorSpeed);
         elevator.setAcceleration(elevatorAccel);
         elevator.setDoorStatus(DoorStatus.fromNumber(elevatorDoorStatus));
@@ -360,5 +359,13 @@ public class ElevatorControlCenter implements IElevatorSystem {
             boolean isPressed = elevatorApi.getElevatorButton(elevator.getNumber(), floor.getNumber());
             elevator.setFloorButton(floor, isPressed);
         }
+    }
+
+    public void setEccMode(ECCMode eccMode) {
+        this.eccMode = eccMode;
+    }
+
+    public ECCMode getEccMode() {
+        return eccMode;
     }
 }
